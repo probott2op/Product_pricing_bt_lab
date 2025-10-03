@@ -1,4 +1,4 @@
-package com.lab.product.repository;
+package com.lab.product.DAO;
 
 import com.lab.product.entity.PRODUCT_RULES;
 import org.springframework.data.jpa.repository.JpaRepository;

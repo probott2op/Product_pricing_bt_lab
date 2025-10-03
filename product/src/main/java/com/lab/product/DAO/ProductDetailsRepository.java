@@ -1,4 +1,4 @@
-package com.lab.product.repository;
+package com.lab.product.DAO;
 
 import com.lab.product.entity.PRODUCT_DETAILS;
 import com.lab.product.entity.ENUMS.PRODUCT_TYPE;

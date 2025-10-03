@@ -5,7 +5,8 @@ import com.lab.product.DTO.ProductDetailsDTO;
 import com.lab.product.entity.PRODUCT_DETAILS;
 import com.lab.product.entity.ENUMS.PRODUCT_TYPE;
 import com.lab.product.entity.ENUMS.PRODUCT_STATUS;
-import com.lab.product.repository.ProductDetailsRepository;
+import com.lab.product.entity.ENUMS.PRODUCT_CURRENCY;
+import com.lab.product.DAO.ProductDetailsRepository;
 import com.lab.product.service.ProductService;
 import com.lab.product.service.helper.ProductMapper;
 import com.lab.product.Exception.ResourceNotFoundException;
@@ -44,6 +45,9 @@ public class ProductServiceImpl implements ProductService {
             }
             if (requestDTO.getStatus() != null) {
                 entity.setStatus(PRODUCT_STATUS.valueOf(requestDTO.getStatus()));
+            }
+            if (requestDTO.getCurrency() != null) {
+                entity.setCurrency(PRODUCT_CURRENCY.valueOf(requestDTO.getCurrency()));
             }
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Invalid enum value: " + e.getMessage());

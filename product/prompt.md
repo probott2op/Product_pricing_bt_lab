@@ -52,7 +52,7 @@ com.lab.product.entity (Use the provided entity classes)
 
 com.lab.product.entity.ENUMS
 
-com.lab.product.repository
+com.lab.product.DAO
 
 com.lab.product.service
 

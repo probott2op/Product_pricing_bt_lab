@@ -5,9 +5,11 @@ import com.lab.product.entity.ENUMS.PRODUCT_STATUS;
 import com.lab.product.entity.ENUMS.PRODUCT_TYPE;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.sql.Date;
 
+@Data
 public class CreateOrUpdateProductRequestDTO {
     @NotBlank(message = "Product code is required")
     private String productCode;
@@ -51,70 +53,5 @@ public class CreateOrUpdateProductRequestDTO {
         if (efctv_date != null && expr_date != null && expr_date.before(efctv_date)) {
             throw new IllegalArgumentException("Expiry date must be after effective date");
         }
-    }
-
-    // Getters and Setters
-    public String getProductCode() {
-        return productCode;
-    }
-
-    public void setProductCode(String productCode) {
-        this.productCode = productCode;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public String getProductType() {
-        return productType;
-    }
-
-    public void setProductType(String productType) {
-        this.productType = productType;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Date getEfctv_date() {
-        return efctv_date;
-    }
-
-    public void setEfctv_date(Date efctv_date) {
-        this.efctv_date = efctv_date;
-    }
-
-    public Date getExpr_date() {
-        return expr_date;
-    }
-
-    public void setExpr_date(Date expr_date) {
-        this.expr_date = expr_date;
     }
 }
