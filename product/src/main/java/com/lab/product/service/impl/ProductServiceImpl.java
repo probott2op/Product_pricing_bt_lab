@@ -37,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
         validateProductRequest(requestDTO);
         
         PRODUCT_DETAILS entity = mapper.toEntity(requestDTO);
+        entity = mapper.fillAuditFields(entity);
         
         // Set enums with validation
         try {
@@ -86,6 +87,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productId));
         
         mapper.updateEntityFromDto(existing, requestDTO);
+        existing = mapper.fillAuditFields(existing);
         
         // Update enums with validation
         try {
