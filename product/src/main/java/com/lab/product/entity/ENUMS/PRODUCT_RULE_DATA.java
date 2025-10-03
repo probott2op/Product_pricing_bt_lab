@@ -10,4 +10,5 @@ public enum PRODUCT_RULE_DATA {
     FREQUENCY,
     AMOUNT_WITH_CURRENCY,
     JSON // It's good practice to be explicit for complex rules
+    ,JSON_MATRIX
 }
