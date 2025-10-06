@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products/{productId}/transactions")
+@RequestMapping("/api/products/{productCode}/transactions")
 @RequiredArgsConstructor
 @Tag(name = "Product Transactions", description = "Product transactions management endpoints")
 public class ProductTransactionController {
@@ -36,9 +36,9 @@ public class ProductTransactionController {
         @ApiResponse(responseCode = "400", description = "Invalid transaction data")
     })
     public ResponseEntity<ProductTransactionDTO> addTransaction(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @Valid @RequestBody ProductTransactionRequestDTO transactionDto) {
-        return new ResponseEntity<>(productTransactionService.addTransactionToProduct(productId, transactionDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(productTransactionService.addTransactionToProduct(productCode, transactionDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -48,9 +48,9 @@ public class ProductTransactionController {
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<Page<ProductTransactionDTO>> getTransactions(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             Pageable pageable) {
-        return ResponseEntity.ok(productTransactionService.getTransactionsForProduct(productId, pageable));
+        return ResponseEntity.ok(productTransactionService.getTransactionsForProduct(productCode, pageable));
     }
 
     @GetMapping("/{transactionId}")
@@ -60,9 +60,9 @@ public class ProductTransactionController {
         @ApiResponse(responseCode = "404", description = "Transaction or product not found")
     })
     public ResponseEntity<ProductTransactionDTO> getTransactionById(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID transactionId) {
-        return ResponseEntity.ok(productTransactionService.getTransactionById(productId, transactionId));
+        return ResponseEntity.ok(productTransactionService.getTransactionById(productCode, transactionId));
     }
 
     @PutMapping("/{transactionId}")
@@ -73,10 +73,10 @@ public class ProductTransactionController {
         @ApiResponse(responseCode = "400", description = "Invalid transaction data")
     })
     public ResponseEntity<ProductTransactionDTO> updateTransaction(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID transactionId,
             @Valid @RequestBody ProductTransactionRequestDTO transactionDto) {
-        return ResponseEntity.ok(productTransactionService.updateTransaction(productId, transactionId, transactionDto));
+        return ResponseEntity.ok(productTransactionService.updateTransaction(productCode, transactionId, transactionDto));
     }
 
     @DeleteMapping("/{transactionId}")
@@ -86,9 +86,9 @@ public class ProductTransactionController {
         @ApiResponse(responseCode = "404", description = "Transaction or product not found")
     })
     public ResponseEntity<Void> deleteTransaction(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID transactionId) {
-        productTransactionService.deleteTransaction(productId, transactionId);
+        productTransactionService.deleteTransaction(productCode, transactionId);
         return ResponseEntity.noContent().build();
     }
 }

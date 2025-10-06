@@ -8,9 +8,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface ProductChargeService {
-    ProductChargeDTO addChargeToProduct(UUID productId, ProductChargeRequestDTO chargeDto);
-    Page<ProductChargeDTO> getChargesForProduct(UUID productId, Pageable pageable);
-    ProductChargeDTO getChargeById(UUID productId, UUID chargeId);
-    ProductChargeDTO updateCharge(UUID productId, UUID chargeId, ProductChargeRequestDTO chargeDto);
-    void deleteCharge(UUID productId, UUID chargeId);
+    ProductChargeDTO addChargeToProduct(String productCode, ProductChargeRequestDTO chargeDto);
+    Page<ProductChargeDTO> getChargesForProduct(String productCode, Pageable pageable);
+    ProductChargeDTO getChargeById(String productCode, UUID chargeId);
+    ProductChargeDTO updateCharge(String productCode, UUID chargeId, ProductChargeRequestDTO chargeDto);
+    void deleteCharge(String productCode, UUID chargeId);
 }

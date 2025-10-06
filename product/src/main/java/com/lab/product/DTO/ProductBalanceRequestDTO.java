@@ -1,5 +1,7 @@
 package com.lab.product.DTO;
 
+import com.lab.product.entity.ENUMS.PRODUCT_BALANCE_TYPE;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -13,7 +15,7 @@ public class ProductBalanceRequestDTO {
     private String balanceName;
     
     @NotNull(message = "Balance type is required")
-    private String balanceType;
+    private PRODUCT_BALANCE_TYPE balanceType;
     
     private String description;
     private boolean isActive = true;

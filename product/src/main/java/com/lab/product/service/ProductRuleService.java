@@ -8,9 +8,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface ProductRuleService {
-    ProductRuleDTO addRuleToProduct(UUID productId, ProductRuleRequestDTO ruleDto);
-    Page<ProductRuleDTO> getRulesForProduct(UUID productId, Pageable pageable);
-    ProductRuleDTO getRuleById(UUID productId, UUID ruleId);
-    ProductRuleDTO updateRule(UUID productId, UUID ruleId, ProductRuleRequestDTO ruleDto);
-    void deleteRule(UUID productId, UUID ruleId);
+    ProductRuleDTO addRuleToProduct(String productCode, ProductRuleRequestDTO ruleDto);
+    Page<ProductRuleDTO> getRulesForProduct(String productCode, Pageable pageable);
+    ProductRuleDTO getRuleById(String productCode, UUID ruleId);
+    ProductRuleDTO updateRule(String productCode, UUID ruleId, ProductRuleRequestDTO ruleDto);
+    void deleteRule(String productCode, UUID ruleId);
 }

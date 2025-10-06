@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products/{productId}/rules")
+@RequestMapping("/api/products/{productCode}/rules")
 @RequiredArgsConstructor
 @Tag(name = "Product Rules", description = "Product rules management endpoints")
 public class ProductRuleController {
@@ -35,9 +35,9 @@ public class ProductRuleController {
         @ApiResponse(responseCode = "400", description = "Invalid rule data")
     })
     public ResponseEntity<ProductRuleDTO> addRule(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @Valid @RequestBody ProductRuleRequestDTO ruleDto) {
-        return new ResponseEntity<>(productRuleService.addRuleToProduct(productId, ruleDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(productRuleService.addRuleToProduct(productCode, ruleDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -47,9 +47,9 @@ public class ProductRuleController {
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<Page<ProductRuleDTO>> getRules(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             Pageable pageable) {
-        return ResponseEntity.ok(productRuleService.getRulesForProduct(productId, pageable));
+        return ResponseEntity.ok(productRuleService.getRulesForProduct(productCode, pageable));
     }
 
     @GetMapping("/{ruleId}")
@@ -59,9 +59,9 @@ public class ProductRuleController {
         @ApiResponse(responseCode = "404", description = "Rule or product not found")
     })
     public ResponseEntity<ProductRuleDTO> getRuleById(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID ruleId) {
-        return ResponseEntity.ok(productRuleService.getRuleById(productId, ruleId));
+        return ResponseEntity.ok(productRuleService.getRuleById(productCode, ruleId));
     }
 
     @PutMapping("/{ruleId}")
@@ -72,10 +72,10 @@ public class ProductRuleController {
         @ApiResponse(responseCode = "400", description = "Invalid rule data")
     })
     public ResponseEntity<ProductRuleDTO> updateRule(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID ruleId,
             @Valid @RequestBody ProductRuleRequestDTO ruleDto) {
-        return ResponseEntity.ok(productRuleService.updateRule(productId, ruleId, ruleDto));
+        return ResponseEntity.ok(productRuleService.updateRule(productCode, ruleId, ruleDto));
     }
 
     @DeleteMapping("/{ruleId}")
@@ -85,9 +85,9 @@ public class ProductRuleController {
         @ApiResponse(responseCode = "404", description = "Rule or product not found")
     })
     public ResponseEntity<Void> deleteRule(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID ruleId) {
-        productRuleService.deleteRule(productId, ruleId);
+        productRuleService.deleteRule(productCode, ruleId);
         return ResponseEntity.noContent().build();
     }
 }

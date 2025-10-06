@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products/{productId}/charges")
+@RequestMapping("/api/products/{productCode}/charges")
 @RequiredArgsConstructor
 @Tag(name = "Product Charges", description = "Product charges management endpoints")
 public class ProductChargeController {
@@ -36,9 +36,9 @@ public class ProductChargeController {
         @ApiResponse(responseCode = "400", description = "Invalid charge data")
     })
     public ResponseEntity<ProductChargeDTO> addCharge(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @Valid @RequestBody ProductChargeRequestDTO chargeDto) {
-        return new ResponseEntity<>(productChargeService.addChargeToProduct(productId, chargeDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(productChargeService.addChargeToProduct(productCode, chargeDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -48,9 +48,9 @@ public class ProductChargeController {
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<Page<ProductChargeDTO>> getCharges(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             Pageable pageable) {
-        return ResponseEntity.ok(productChargeService.getChargesForProduct(productId, pageable));
+        return ResponseEntity.ok(productChargeService.getChargesForProduct(productCode, pageable));
     }
 
     @GetMapping("/{chargeId}")
@@ -60,9 +60,9 @@ public class ProductChargeController {
         @ApiResponse(responseCode = "404", description = "Charge or product not found")
     })
     public ResponseEntity<ProductChargeDTO> getChargeById(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID chargeId) {
-        return ResponseEntity.ok(productChargeService.getChargeById(productId, chargeId));
+        return ResponseEntity.ok(productChargeService.getChargeById(productCode, chargeId));
     }
 
     @PutMapping("/{chargeId}")
@@ -73,10 +73,10 @@ public class ProductChargeController {
         @ApiResponse(responseCode = "400", description = "Invalid charge data")
     })
     public ResponseEntity<ProductChargeDTO> updateCharge(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID chargeId,
             @Valid @RequestBody ProductChargeRequestDTO chargeDto) {
-        return ResponseEntity.ok(productChargeService.updateCharge(productId, chargeId, chargeDto));
+        return ResponseEntity.ok(productChargeService.updateCharge(productCode, chargeId, chargeDto));
     }
 
     @DeleteMapping("/{chargeId}")
@@ -86,9 +86,9 @@ public class ProductChargeController {
         @ApiResponse(responseCode = "404", description = "Charge or product not found")
     })
     public ResponseEntity<Void> deleteCharge(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID chargeId) {
-        productChargeService.deleteCharge(productId, chargeId);
+        productChargeService.deleteCharge(productCode, chargeId);
         return ResponseEntity.noContent().build();
     }
 }

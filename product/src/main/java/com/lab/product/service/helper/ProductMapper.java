@@ -15,6 +15,66 @@ import java.util.stream.Collectors;
 @Component
 public class ProductMapper {
 
+    public ProductBalanceDTO toBalanceDto(PRODUCT_BALANCE balance) {
+        if (balance == null) return null;
+        ProductBalanceDTO dto = new ProductBalanceDTO();
+        dto.setBalanceId(balance.getBalanceId());
+        dto.setBalanceType(balance.getBalanceType());
+        return dto;
+    }
+    
+    public ProductChargeDTO toChargeDto(PRODUCT_CHARGES charge) {
+        if (charge == null) return null;
+        ProductChargeDTO dto = new ProductChargeDTO();
+        dto.setChargeId(charge.getChargeId());
+        dto.setChargeType(charge.getChargeType());
+        dto.setChargeCode(charge.getChargeCode());
+        dto.setAmount(charge.getChargeValue());
+        dto.setCalculationType(charge.getCalculationType());
+        dto.setFrequency(charge.getFrequency());
+        return dto;
+    }
+    
+    public ProductRoleDTO toRoleDto(PRODUCT_ROLE role) {
+        if (role == null) return null;
+        ProductRoleDTO dto = new ProductRoleDTO();
+        dto.setRoleId(role.getRoleId());
+        dto.setRoleType(role.getRoleType());
+        dto.setRoleName(role.getRoleType() != null ? role.getRoleType().name() : null);
+        return dto;
+    }
+    
+    public ProductRuleDTO toRuleDto(PRODUCT_RULES rule) {
+        if (rule == null) return null;
+        ProductRuleDTO dto = new ProductRuleDTO();
+        dto.setRuleId(rule.getRuleId());
+        dto.setRuleType(rule.getRuleType());
+        dto.setDataType(rule.getDataType());
+        dto.setRuleValue(rule.getRuleValue());
+        dto.setValidationType(rule.getValidationType());
+        return dto;
+    }
+    
+    public ProductTransactionDTO toTransactionDto(PRODUCT_TRANSACTION transaction) {
+        if (transaction == null) return null;
+        ProductTransactionDTO dto = new ProductTransactionDTO();
+        dto.setTransactionId(transaction.getId());
+        dto.setTransactionType(transaction.getTransactionType());
+        dto.setAmountLimit(null); // Set to null or a default value as entity doesn't have this field
+        return dto;
+    }
+    
+    public ProductCommunicationDTO toCommunicationDto(PRODUCT_COMMUNICATION communication) {
+        if (communication == null) return null;
+        ProductCommunicationDTO dto = new ProductCommunicationDTO();
+        dto.setCommId(communication.getCommId());
+        dto.setCommunicationType(communication.getCommunicationType());
+        dto.setChannel(communication.getChannel());
+        dto.setEvent(communication.getEvent());
+        dto.setTemplate(communication.getTemplate());
+        return dto;
+    }
+    
     public <T extends AuditLoggable> T fillAuditFields(T entity) {
         if (entity == null) return null;
         

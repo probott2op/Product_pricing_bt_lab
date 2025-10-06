@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products/{productId}/balances")
+@RequestMapping("/api/products/{productCode}/balances")
 @RequiredArgsConstructor
 @Tag(name = "Product Balances", description = "Product balances management endpoints")
 public class ProductBalanceController {
@@ -36,9 +36,9 @@ public class ProductBalanceController {
         @ApiResponse(responseCode = "400", description = "Invalid balance data")
     })
     public ResponseEntity<ProductBalanceDTO> addBalance(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @Valid @RequestBody ProductBalanceRequestDTO balanceDto) {
-        return new ResponseEntity<>(productBalanceService.addBalanceToProduct(productId, balanceDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(productBalanceService.addBalanceToProduct(productCode, balanceDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -48,9 +48,9 @@ public class ProductBalanceController {
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<Page<ProductBalanceDTO>> getBalances(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             Pageable pageable) {
-        return ResponseEntity.ok(productBalanceService.getBalancesForProduct(productId, pageable));
+        return ResponseEntity.ok(productBalanceService.getBalancesForProduct(productCode, pageable));
     }
 
     @GetMapping("/{balanceId}")
@@ -60,9 +60,9 @@ public class ProductBalanceController {
         @ApiResponse(responseCode = "404", description = "Balance or product not found")
     })
     public ResponseEntity<ProductBalanceDTO> getBalanceById(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID balanceId) {
-        return ResponseEntity.ok(productBalanceService.getBalanceById(productId, balanceId));
+        return ResponseEntity.ok(productBalanceService.getBalanceById(productCode, balanceId));
     }
 
     @PutMapping("/{balanceId}")
@@ -73,10 +73,10 @@ public class ProductBalanceController {
         @ApiResponse(responseCode = "400", description = "Invalid balance data")
     })
     public ResponseEntity<ProductBalanceDTO> updateBalance(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID balanceId,
             @Valid @RequestBody ProductBalanceRequestDTO balanceDto) {
-        return ResponseEntity.ok(productBalanceService.updateBalance(productId, balanceId, balanceDto));
+        return ResponseEntity.ok(productBalanceService.updateBalance(productCode, balanceId, balanceDto));
     }
 
     @DeleteMapping("/{balanceId}")
@@ -86,9 +86,9 @@ public class ProductBalanceController {
         @ApiResponse(responseCode = "404", description = "Balance or product not found")
     })
     public ResponseEntity<Void> deleteBalance(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID balanceId) {
-        productBalanceService.deleteBalance(productId, balanceId);
+        productBalanceService.deleteBalance(productCode, balanceId);
         return ResponseEntity.noContent().build();
     }
 }

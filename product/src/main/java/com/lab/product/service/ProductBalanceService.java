@@ -8,9 +8,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface ProductBalanceService {
-    ProductBalanceDTO addBalanceToProduct(UUID productId, ProductBalanceRequestDTO balanceDto);
-    Page<ProductBalanceDTO> getBalancesForProduct(UUID productId, Pageable pageable);
-    ProductBalanceDTO getBalanceById(UUID productId, UUID balanceId);
-    ProductBalanceDTO updateBalance(UUID productId, UUID balanceId, ProductBalanceRequestDTO balanceDto);
-    void deleteBalance(UUID productId, UUID balanceId);
+    ProductBalanceDTO addBalanceToProduct(String productCode, ProductBalanceRequestDTO balanceDto);
+    Page<ProductBalanceDTO> getBalancesForProduct(String productCode, Pageable pageable);
+    ProductBalanceDTO getBalanceById(String productCode, UUID balanceId);
+    ProductBalanceDTO updateBalance(String productCode, UUID balanceId, ProductBalanceRequestDTO balanceDto);
+    void deleteBalance(String productCode, UUID balanceId);
 }

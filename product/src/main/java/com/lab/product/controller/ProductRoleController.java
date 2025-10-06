@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/products/{productId}/roles")
+@RequestMapping("/api/products/{productCode}/roles")
 @RequiredArgsConstructor
 @Tag(name = "Product Roles", description = "Product roles management endpoints")
 public class ProductRoleController {
@@ -36,9 +36,9 @@ public class ProductRoleController {
         @ApiResponse(responseCode = "400", description = "Invalid role data")
     })
     public ResponseEntity<ProductRoleDTO> addRole(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @Valid @RequestBody ProductRoleRequestDTO roleDto) {
-        return new ResponseEntity<>(productRoleService.addRoleToProduct(productId, roleDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(productRoleService.addRoleToProduct(productCode, roleDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -48,9 +48,9 @@ public class ProductRoleController {
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<Page<ProductRoleDTO>> getRoles(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             Pageable pageable) {
-        return ResponseEntity.ok(productRoleService.getRolesForProduct(productId, pageable));
+        return ResponseEntity.ok(productRoleService.getRolesForProduct(productCode, pageable));
     }
 
     @GetMapping("/{roleId}")
@@ -60,9 +60,9 @@ public class ProductRoleController {
         @ApiResponse(responseCode = "404", description = "Role or product not found")
     })
     public ResponseEntity<ProductRoleDTO> getRoleById(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID roleId) {
-        return ResponseEntity.ok(productRoleService.getRoleById(productId, roleId));
+        return ResponseEntity.ok(productRoleService.getRoleById(productCode, roleId));
     }
 
     @PutMapping("/{roleId}")
@@ -73,10 +73,10 @@ public class ProductRoleController {
         @ApiResponse(responseCode = "400", description = "Invalid role data")
     })
     public ResponseEntity<ProductRoleDTO> updateRole(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID roleId,
             @Valid @RequestBody ProductRoleRequestDTO roleDto) {
-        return ResponseEntity.ok(productRoleService.updateRole(productId, roleId, roleDto));
+        return ResponseEntity.ok(productRoleService.updateRole(productCode, roleId, roleDto));
     }
 
     @DeleteMapping("/{roleId}")
@@ -86,9 +86,9 @@ public class ProductRoleController {
         @ApiResponse(responseCode = "404", description = "Role or product not found")
     })
     public ResponseEntity<Void> deleteRole(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @PathVariable UUID roleId) {
-        productRoleService.deleteRole(productId, roleId);
+        productRoleService.deleteRole(productCode, roleId);
         return ResponseEntity.noContent().build();
     }
 }

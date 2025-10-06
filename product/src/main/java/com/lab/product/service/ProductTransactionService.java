@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface ProductTransactionService {
-    ProductTransactionDTO addTransactionToProduct(UUID productId, ProductTransactionRequestDTO transactionDto);
-    Page<ProductTransactionDTO> getTransactionsForProduct(UUID productId, Pageable pageable);
-    ProductTransactionDTO getTransactionById(UUID productId, UUID transactionId);
-    ProductTransactionDTO updateTransaction(UUID productId, UUID transactionId, ProductTransactionRequestDTO transactionDto);
-    void deleteTransaction(UUID productId, UUID transactionId);
+    ProductTransactionDTO addTransactionToProduct(String productCode, ProductTransactionRequestDTO transactionDto);
+    Page<ProductTransactionDTO> getTransactionsForProduct(String productCode, Pageable pageable);
+    ProductTransactionDTO getTransactionById(String productCode, UUID transactionId);
+    ProductTransactionDTO updateTransaction(String productCode, UUID transactionId, ProductTransactionRequestDTO transactionDto);
+    void deleteTransaction(String productCode, UUID transactionId);
 }
