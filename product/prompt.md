@@ -4,41 +4,18 @@ Project Goal
 
 To build a robust and maintainable module that allows a bank to define, create, update, and query financial products like Term Deposits, using a flexible business rule engine.
 
-Design Change: Interest as a Business Rule
+Design Decision: Product Interest Rates
 
-Instead of a separate PRODUCT_INTEREST table, we will model the interest rate matrix as a "Complex Business Rule" within the PRODUCT_RULES entity. This provides greater flexibility. The ruleValue field of a PRODUCT_RULES record will store a JSON string when the rule represents an interest matrix.
+Product interest rates are managed through a dedicated PRODUCT_INTEREST entity with its own table (interest_rates). This provides a structured approach to storing interest rate matrices for different terms and payout frequencies.
 
-Example JSON for an Interest Rate Rule:
-When creating a rule with ruleCode = INTEREST_RATE_MATRIX, the ruleValue field should contain a JSON string like this:
+The PRODUCT_INTEREST entity stores:
+- termInMonths: The term duration (e.g., 12, 24, 36, 60 months)
+- rateCumulative: Base rate for cumulative option (paid at maturity)
+- rateNonCumulativeMonthly: Rate for monthly payout
+- rateNonCumulativeQuarterly: Rate for quarterly payout
+- rateNonCumulativeYearly: Rate for yearly payout
 
-{
-  "rateMatrix": [
-    {
-      "minAmount": 0,
-      "maxAmount": 100000,
-      "minTermDays": 90,
-      "maxTermDays": 180,
-      "customerCategory": "RETAIL",
-      "interestRate": 0.0550
-    },
-    {
-      "minAmount": 0,
-      "maxAmount": 100000,
-      "minTermDays": 181,
-      "maxTermDays": 365,
-      "customerCategory": "RETAIL",
-      "interestRate": 0.0600
-    },
-    {
-      "minAmount": 0,
-      "maxAmount": 100000,
-      "minTermDays": 90,
-      "maxTermDays": 365,
-      "customerCategory": "SENIOR_CITIZEN",
-      "interestRate": 0.0650
-    }
-  ]
-}
+This allows flexible querying and management of interest rates per product.
 
 1. Project Structure
 
@@ -68,13 +45,11 @@ You have been provided with the core entity classes. Your first task is to refin
 
 A. Update PRODUCT_DETAILS.java
 
-This is the aggregate root. Remove the relationship to PRODUCT_INTEREST and add the relationship for the new PRODUCT_COMMUNICATION entity.
+This is the aggregate root. It should have relationships to all sub-entities.
 
 // Inside PRODUCT_DETAILS class
 
 // ... existing fields and relationships for rules and charges ...
-
-// REMOVE: @OneToMany for PRODUCT_INTEREST
 
 @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 private List<PRODUCT_ROLE> productRoles;
@@ -85,13 +60,15 @@ private List<PRODUCT_TRANSACTION> productTransactions;
 @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 private List<PRODUCT_BALANCE> productBalances;
 
-// Add this new relationship for the new entity below
 @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 private List<PRODUCT_COMMUNICATION> productCommunications;
 
-B. REMOVE PRODUCT_INTEREST.java
+@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+private List<PRODUCT_INTEREST> productInterests;
 
-This entity is no longer needed and should be deleted.
+B. PRODUCT_INTEREST.java
+
+This entity manages interest rates for different terms and payout frequencies. It is stored in the interest_rates table.
 
 C. Create New Entity PRODUCT_COMMUNICATION.java
 
@@ -188,8 +165,12 @@ ProductBalanceDTO.java
 
 ProductCommunicationDTO.java
 
+ProductInterestDTO.java - Response DTO with rateId, termInMonths, and all rate fields
+
+ProductInterestRequestDTO.java - Request DTO with validation annotations
+
 ProductDetailsDTO.java (The Main DTO)
-This DTO will be a nested structure representing the entire product definition. Remove productInterests.
+This DTO will be a nested structure representing the entire product definition.
 
 // File: com/lab/product/dto/ProductDetailsDTO.java
 @Data
@@ -200,7 +181,7 @@ public class ProductDetailsDTO {
     // ... other product detail fields ...
     private List<ProductRuleDTO> productRules;
     private List<ProductChargeDTO> productCharges;
-    // REMOVE: private List<ProductInterestDTO> productInterests;
+    private List<ProductInterestDTO> productInterests;
     private List<ProductRoleDTO> productRoles;
     private List<ProductTransactionDTO> productTransactions;
     private List<ProductBalanceDTO> productBalances;
@@ -209,43 +190,86 @@ public class ProductDetailsDTO {
 }
 
 CreateOrUpdateProductRequestDTO.java
-This will be used as the @RequestBody. It's similar to ProductDetailsDTO but without read-only fields. Remove productInterests.
+This will be used as the @RequestBody. It's similar to ProductDetailsDTO but without read-only fields.
 
-4. Repositories (/repository)
+4. Repositories (package: com.lab.product.DAO)
 
 Create a JPA repository interface for each entity.
 
 ProductDetailsRepository.java: This is the most important one. It must extend JpaRepository<PRODUCT_DETAILS, UUID> and include methods for searching.
 
-// File: com/lab/product/repository/ProductDetailsRepository.java
+// File: com/lab/product/DAO/ProductDetailsRepository.java
 public interface ProductDetailsRepository extends JpaRepository<PRODUCT_DETAILS, UUID> {
     Optional<PRODUCT_DETAILS> findByProductCode(String productCode);
     List<PRODUCT_DETAILS> findByProductType(PRODUCT_TYPE productType);
     List<PRODUCT_DETAILS> findByStatus(PRODUCT_STATUS status);
-    List<PRODUCT_DETAILS> findByEfctv_dateBetween(Date startDate, Date endDate);
+    
+    @Query("SELECT p FROM PRODUCT_DETAILS p WHERE p.efctv_date > :startDate AND p.efctv_date < :endDate")
+    List<PRODUCT_DETAILS> findByEfctv_dateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    
+    Page<PRODUCT_DETAILS> findAllProducts(Pageable pageable);
 }
 
-REMOVE ProductInterestRepository.java.
+ProductInterestRepository.java: Repository for PRODUCT_INTEREST entity
 
-Create repositories for other entities as needed (e.g., ProductChargesRepository, ProductRulesRepository, etc.).
+// File: com/lab/product/DAO/ProductInterestRepository.java
+public interface ProductInterestRepository extends JpaRepository<PRODUCT_INTEREST, Long> {
+    List<PRODUCT_INTEREST> findByProduct(PRODUCT_DETAILS product);
+    Optional<PRODUCT_INTEREST> findByProductAndRateId(PRODUCT_DETAILS product, Long rateId);
+    boolean existsByProductAndRateId(PRODUCT_DETAILS product, Long rateId);
+}
+
+Create repositories for other entities as needed:
+- ProductRoleRepository: Uses findByProduct(), findByProductAndRoleId()
+- ProductTransactionRepository: Uses findByProduct(), findByProductAndTransactionId()
+- ProductBalanceRepository: Uses findByProduct(), findByProductAndBalanceId()
+- ProductCommunicationRepository, ProductChargeRepository, ProductRuleRepository
 
 5. Service Helper (/service/helper)
 
-Create a ProductMapper.java class to handle conversions between DTOs and Entities. Remove all logic related to PRODUCT_INTEREST.
+Create a ProductMapper.java class to handle conversions between DTOs and Entities. Include mapping methods for all entities:
+- toRoleDto() - Maps PRODUCT_ROLE to ProductRoleDTO
+- toTransactionDto() - Maps PRODUCT_TRANSACTION to ProductTransactionDTO
+- toBalanceDto() - Maps PRODUCT_BALANCE to ProductBalanceDTO
+- toChargeDto() - Maps PRODUCT_CHARGES to ProductChargeDTO
+- toInterestDto() - Maps PRODUCT_INTEREST to ProductInterestDTO
+- And corresponding reverse mappings
 
 6. Service Layer (/service and /service/impl)
 
-Implement the service logic. The service will need to be aware of how to handle the JSON-based interest rule. You might need a JSON processing library like Jackson or Gson, which Spring Boot includes by default.
+Implement the service logic. All services use String productCode (not UUID) to identify products.
 
-ProductService.java (Interface) - No changes needed here.
+ProductService.java (Interface) - Main product operations
 
-ProductServiceImpl.java (Implementation)
+ProductServiceImpl.java (Implementation) - Uses ProductDetailsRepository.findByProductCode()
 
-In createProduct and updateProduct, when mapping ProductRuleDTO to PRODUCT_RULES, check if the rule is for an interest matrix. If so, validate the JSON structure of ruleValue before saving.
+**Sub-Resource Services:**
+
+ProductRoleService/ProductRoleServiceImpl
+- Methods: addRoleToProduct, getRolesForProduct, getRoleById, updateRole, deleteRole
+- All methods use String productCode parameter
+
+ProductRuleService/ProductRuleServiceImpl
+- Standard CRUD operations using productCode
+
+ProductBalanceService/ProductBalanceServiceImpl
+- Uses entity-based queries: findByProduct(), findByProductAndBalanceId()
+
+ProductChargeService/ProductChargeServiceImpl
+- Full CRUD operations with productCode
+
+ProductTransactionService/ProductTransactionServiceImpl
+- Uses PRODUCT_TRANSACTION_TYPE enum
+- Entity-based repository methods
+
+ProductInterestService/ProductInterestServiceImpl (NEW)
+- Methods: addInterestToProduct, getInterestRatesForProduct, getInterestRateById, updateInterestRate, deleteInterestRate
+- Uses ProductInterestRepository and ProductMapper
+- Includes audit logging through AuditLoggable
 
 7. Controller (/controller)
 
-Create ProductController.java following the conventions from the provided BankingController.java. The API endpoints remain the same.
+Create ProductController.java for main product operations. All controllers follow nested REST API pattern with String productCode.
 
 // File: com/lab/product/controller/ProductController.java
 @RestController
@@ -260,16 +284,31 @@ public class ProductController {
     public ResponseEntity<ProductDetailsDTO> createProduct(@RequestBody CreateOrUpdateProductRequestDTO requestDTO) { ... }
 
     // --- Update/Maintain an existing Product ---
-    @PostMapping("/{productId}")
-    public ResponseEntity<ProductDetailsDTO> updateProduct(@PathVariable UUID productId, @RequestBody CreateOrUpdateProductRequestDTO requestDTO) { ... }
+    @PostMapping("/{productCode}")
+    public ResponseEntity<ProductDetailsDTO> updateProduct(@PathVariable String productCode, @RequestBody CreateOrUpdateProductRequestDTO requestDTO) { ... }
 
-    // --- Inquire: Get a single product by its ID ---
-    @GetMapping("/{productId}")
-    public ResponseEntity<ProductDetailsDTO> getProductById(@PathVariable UUID productId) { ... }
-
-    // --- Inquire: Get a single product by its unique code ---
-    @GetMapping("/byCode/{productCode}")
+    // --- Inquire: Get a single product by its code ---
+    @GetMapping("/{productCode}")
     public ResponseEntity<ProductDetailsDTO> getProductByCode(@PathVariable String productCode) { ... }
+
+**Sub-Resource Controllers (Nested REST API):**
+
+ProductRoleController - /api/products/{productCode}/roles
+ProductBalanceController - /api/products/{productCode}/balances
+ProductChargeController - /api/products/{productCode}/charges
+ProductTransactionController - /api/products/{productCode}/transactions
+ProductCommunicationController - /api/products/{productCode}/communications
+ProductRuleController - /api/products/{productCode}/rules
+ProductInterestController - /api/products/{productCode}/interest-rates (NEW)
+
+Each sub-resource controller provides:
+- POST /{productCode}/[resource] - Create new sub-resource
+- GET /{productCode}/[resource] - List all sub-resources
+- GET /{productCode}/[resource]/{id} - Get specific sub-resource
+- PUT /{productCode}/[resource]/{id} - Update sub-resource
+- DELETE /{productCode}/[resource]/{id} - Delete sub-resource
+
+All controllers use @PathVariable String productCode and include Swagger/OpenAPI documentation.
 
     // --- Get list of products based on search criteria ---
     @GetMapping("/search")

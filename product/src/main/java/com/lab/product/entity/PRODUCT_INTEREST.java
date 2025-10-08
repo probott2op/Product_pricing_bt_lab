@@ -14,7 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "interest_rates")
 @Data
-public class PRODUCT_INTEREST {
+public class PRODUCT_INTEREST extends AuditLoggable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID rateId;
@@ -23,23 +23,22 @@ public class PRODUCT_INTEREST {
     @JoinColumn(name = "product_id", nullable = false)
     private PRODUCT_DETAILS product;
 
-    private BigDecimal minAmount;
-    private BigDecimal maxAmount;
-    private Integer minTermDays;
-    private Integer maxTermDays;
+    @Column(nullable = false, unique = true)
+    private Integer termInMonths; // e.g., 12, 24, 36, 60
 
-    @Enumerated(EnumType.STRING)
-    private PRODUCT_CUSTOMERCAT customerCategory;
+    // Base rate for cumulative option (paid at maturity)
+    @Column(nullable = false, precision = 5, scale = 4)
+    private BigDecimal rateCumulative; // e.g., for 36 months, this would be 8.00% -> 0.0800
+
+     // Base rates for non-cumulative options
+    @Column(nullable = false, precision = 5, scale = 4)
+    private BigDecimal rateNonCumulativeMonthly; // e.g., 7.85% -> 0.0785
 
     @Column(nullable = false, precision = 5, scale = 4)
-    private BigDecimal interestRate;
+    private BigDecimal rateNonCumulativeQuarterly; // e.g., 7.90% -> 0.0790
 
-    @Column(nullable = false)
-    private LocalDate effectiveDate;
-    private LocalDate expiryDate;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    @Column(nullable = false, precision = 5, scale = 4)
+    private BigDecimal rateNonCumulativeYearly; // e.g., 8.00% -> 0.0800
 
 
 }

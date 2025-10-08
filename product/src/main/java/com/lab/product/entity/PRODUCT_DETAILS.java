@@ -62,4 +62,6 @@ public class PRODUCT_DETAILS extends AuditLoggable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<PRODUCT_COMMUNICATION> productCommunications;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<PRODUCT_INTEREST> productInterest;
 }

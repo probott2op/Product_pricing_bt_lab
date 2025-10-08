@@ -12,35 +12,47 @@ POST /api/products - Create a new product (basic details only).
 
 GET /api/products - Fetch a list of all products.
 
-GET /api/products/{productId} - Fetch a single product's complete details.
+GET /api/products/{productCode} - Fetch a single product's complete details.
 
-PUT /api/products/{productId} - Update a product's basic details.
+PUT /api/products/{productCode} - Update a product's basic details.
 
-DELETE /api/products/{productId} - Delete a product.
+DELETE /api/products/{productCode} - Delete a product.
 
 Product Rules (Sub-Resource)
 
-POST /api/products/{productId}/rules - Add a new rule to a product.
+POST /api/products/{productCode}/rules - Add a new rule to a product.
 
-GET /api/products/{productId}/rules - Get all rules for a specific product.
+GET /api/products/{productCode}/rules - Get all rules for a specific product.
 
-GET /api/products/{productId}/rules/{ruleId} - Get a single rule.
+GET /api/products/{productCode}/rules/{ruleId} - Get a single rule.
 
-PUT /api/products/{productId}/rules/{ruleId} - Update a single rule.
+PUT /api/products/{productCode}/rules/{ruleId} - Update a single rule.
 
-DELETE /api/products/{productId}/rules/{ruleId} - Remove a rule from a product.
+DELETE /api/products/{productCode}/rules/{ruleId} - Remove a rule from a product.
 
 Product Charges (Sub-Resource)
 
-Follow the exact same pattern as Product Rules:
+POST /api/products/{productCode}/charges
 
-POST /api/products/{productId}/charges
+GET /api/products/{productCode}/charges
 
-GET /api/products/{productId}/charges
+GET /api/products/{productCode}/charges/{chargeId}
 
-GET /api/products/{productId}/charges/{chargeId}
+PUT /api/products/{productCode}/charges/{chargeId}
 
-...and so on.
+DELETE /api/products/{productCode}/charges/{chargeId}
+
+Product Interest Rates (Sub-Resource)
+
+POST /api/products/{productCode}/interest-rates - Add a new interest rate to a product.
+
+GET /api/products/{productCode}/interest-rates - Get all interest rates for a specific product.
+
+GET /api/products/{productCode}/interest-rates/{rateId} - Get a single interest rate.
+
+PUT /api/products/{productCode}/interest-rates/{rateId} - Update a single interest rate.
+
+DELETE /api/products/{productCode}/interest-rates/{rateId} - Remove an interest rate from a product.
 
 (Apply this nested pattern for ALL other sub-resources: Roles, Transactions, Balances, and Communications).
 
@@ -76,19 +88,35 @@ Ensure createProduct and updateProduct now accept the simplified CreateOrUpdateP
 
 Create New Service Interfaces:
 
+**Note: All services use String productCode (not UUID) for product identification**
+
 ProductRuleService.java:
 
 public interface ProductRuleService {
-    ProductRuleDTO addRuleToProduct(UUID productId, ProductRuleRequestDTO ruleDto);
-    List<ProductRuleDTO> getRulesForProduct(UUID productId);
-    ProductRuleDTO getRuleById(UUID productId, UUID ruleId);
-    ProductRuleDTO updateRule(UUID productId, UUID ruleId, ProductRuleRequestDTO ruleDto);
-    void deleteRule(UUID productId, UUID ruleId);
+    ProductRuleDTO addRuleToProduct(String productCode, ProductRuleRequestDTO ruleDto);
+    List<ProductRuleDTO> getRulesForProduct(String productCode);
+    ProductRuleDTO getRuleById(String productCode, Long ruleId);
+    ProductRuleDTO updateRule(String productCode, Long ruleId, ProductRuleRequestDTO ruleDto);
+    void deleteRule(String productCode, Long ruleId);
 }
 
-Create similar service interfaces for ProductChargeService, ProductRoleService, etc., following the exact same method pattern.
+ProductInterestService.java:
 
-Implement All New Services in the /service/impl package. Each implementation will inject its own repository (e.g., ProductRuleServiceImpl will inject ProductRulesRepository and ProductDetailsRepository).
+public interface ProductInterestService {
+    ProductInterestDTO addInterestToProduct(String productCode, ProductInterestRequestDTO interestDto);
+    List<ProductInterestDTO> getInterestRatesForProduct(String productCode);
+    ProductInterestDTO getInterestRateById(String productCode, Long rateId);
+    ProductInterestDTO updateInterestRate(String productCode, Long rateId, ProductInterestRequestDTO interestDto);
+    void deleteInterestRate(String productCode, Long rateId);
+}
+
+Create similar service interfaces for ProductChargeService, ProductRoleService, ProductBalanceService, ProductTransactionService, ProductCommunicationService, following the exact same method pattern with String productCode.
+
+Implement All New Services in the /service/impl package:
+- Each implementation injects its own repository (e.g., ProductRuleServiceImpl injects ProductRuleRepository from DAO package)
+- Each implementation injects ProductDetailsRepository to fetch the product by productCode
+- All implementations use entity-based repository methods like findByProduct(), findByProductAndXxxId()
+- ProductInterestServiceImpl includes audit logging through AuditLoggable base class
 
 Step 3: Split the Controller Layer (/controller)
 
@@ -100,6 +128,8 @@ This controller will only handle the top-level /api/products endpoints.
 
 Remove all methods that were managing nested lists.
 
+**Note: All controllers use String productCode in path variables (not UUID productId)**
+
 // File: com/lab/product/controller/ProductController.java
 @RestController
 @RequestMapping("/api/products")
@@ -109,53 +139,94 @@ public class ProductController {
     public ResponseEntity<ProductDetailsDTO> createProduct(@RequestBody CreateOrUpdateProductRequestDTO requestDTO) { ... }
     @GetMapping
     public ResponseEntity<List<ProductDetailsDTO>> getAllProducts() { ... }
-    @GetMapping("/{productId}")
-    public ResponseEntity<ProductDetailsDTO> getProductById(@PathVariable UUID productId) { ... }
-    @PutMapping("/{productId}")
-    public ResponseEntity<ProductDetailsDTO> updateProduct(@PathVariable UUID productId, @RequestBody CreateOrUpdateProductRequestDTO requestDTO) { ... }
-    @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) { ... }
+    @GetMapping("/{productCode}")
+    public ResponseEntity<ProductDetailsDTO> getProductByCode(@PathVariable String productCode) { ... }
+    @PutMapping("/{productCode}")
+    public ResponseEntity<ProductDetailsDTO> updateProduct(@PathVariable String productCode, @RequestBody CreateOrUpdateProductRequestDTO requestDTO) { ... }
+    @DeleteMapping("/{productCode}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable String productCode) { ... }
 }
 
 Create ProductRuleController.java:
 
-This controller will manage the nested rule endpoints. Note the @RequestMapping.
+This controller will manage the nested rule endpoints. Note the @RequestMapping uses {productCode}.
 
 // File: com/lab/product/controller/ProductRuleController.java
 @RestController
-@RequestMapping("/api/products/{productId}/rules")
+@RequestMapping("/api/products/{productCode}/rules")
 public class ProductRuleController {
     @Autowired
     private ProductRuleService productRuleService;
 
     @PostMapping
-    public ResponseEntity<ProductRuleDTO> addRule(@PathVariable UUID productId, @RequestBody ProductRuleRequestDTO ruleDto) {
-        return new ResponseEntity<>(productRuleService.addRuleToProduct(productId, ruleDto), HttpStatus.CREATED);
+    public ResponseEntity<ProductRuleDTO> addRule(@PathVariable String productCode, @RequestBody ProductRuleRequestDTO ruleDto) {
+        return new ResponseEntity<>(productRuleService.addRuleToProduct(productCode, ruleDto), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductRuleDTO>> getRules(@PathVariable UUID productId) {
-        return ResponseEntity.ok(productRuleService.getRulesForProduct(productId));
+    public ResponseEntity<List<ProductRuleDTO>> getRules(@PathVariable String productCode) {
+        return ResponseEntity.ok(productRuleService.getRulesForProduct(productCode));
     }
 
     @GetMapping("/{ruleId}")
-    public ResponseEntity<ProductRuleDTO> getRuleById(@PathVariable UUID productId, @PathVariable UUID ruleId) {
-        return ResponseEntity.ok(productRuleService.getRuleById(productId, ruleId));
+    public ResponseEntity<ProductRuleDTO> getRuleById(@PathVariable String productCode, @PathVariable Long ruleId) {
+        return ResponseEntity.ok(productRuleService.getRuleById(productCode, ruleId));
     }
 
     @PutMapping("/{ruleId}")
-    public ResponseEntity<ProductRuleDTO> updateRule(@PathVariable UUID productId, @PathVariable UUID ruleId, @RequestBody ProductRuleRequestDTO ruleDto) {
-        return ResponseEntity.ok(productRuleService.updateRule(productId, ruleId, ruleDto));
+    public ResponseEntity<ProductRuleDTO> updateRule(@PathVariable String productCode, @PathVariable Long ruleId, @RequestBody ProductRuleRequestDTO ruleDto) {
+        return ResponseEntity.ok(productRuleService.updateRule(productCode, ruleId, ruleDto));
     }
 
     @DeleteMapping("/{ruleId}")
-    public ResponseEntity<Void> deleteRule(@PathVariable UUID productId, @PathVariable UUID ruleId) {
-        productRuleService.deleteRule(productId, ruleId);
+    public ResponseEntity<Void> deleteRule(@PathVariable String productCode, @PathVariable Long ruleId) {
+        productRuleService.deleteRule(productCode, ruleId);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+Create ProductInterestController.java:
+
+// File: com/lab/product/controller/ProductInterestController.java
+@RestController
+@RequestMapping("/api/products/{productCode}/interest-rates")
+public class ProductInterestController {
+    @Autowired
+    private ProductInterestService productInterestService;
+
+    @PostMapping
+    @Operation(summary = "Add interest rate to product")
+    public ResponseEntity<ProductInterestDTO> addInterestRate(@PathVariable String productCode, @Valid @RequestBody ProductInterestRequestDTO requestDTO) {
+        return new ResponseEntity<>(productInterestService.addInterestToProduct(productCode, requestDTO), HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get all interest rates for product")
+    public ResponseEntity<List<ProductInterestDTO>> getInterestRates(@PathVariable String productCode) {
+        return ResponseEntity.ok(productInterestService.getInterestRatesForProduct(productCode));
+    }
+
+    @GetMapping("/{rateId}")
+    @Operation(summary = "Get specific interest rate")
+    public ResponseEntity<ProductInterestDTO> getInterestRateById(@PathVariable String productCode, @PathVariable Long rateId) {
+        return ResponseEntity.ok(productInterestService.getInterestRateById(productCode, rateId));
+    }
+
+    @PutMapping("/{rateId}")
+    @Operation(summary = "Update interest rate")
+    public ResponseEntity<ProductInterestDTO> updateInterestRate(@PathVariable String productCode, @PathVariable Long rateId, @Valid @RequestBody ProductInterestRequestDTO requestDTO) {
+        return ResponseEntity.ok(productInterestService.updateInterestRate(productCode, rateId, requestDTO));
+    }
+
+    @DeleteMapping("/{rateId}")
+    @Operation(summary = "Delete interest rate")
+    public ResponseEntity<Void> deleteInterestRate(@PathVariable String productCode, @PathVariable Long rateId) {
+        productInterestService.deleteInterestRate(productCode, rateId);
         return ResponseEntity.noContent().build();
     }
 }
 
 Create Additional Controllers:
 
-Create ProductChargeController.java, ProductRoleController.java, etc., following the exact same pattern as ProductRuleController.java, each with its own @RequestMapping and injecting its corresponding service.
+Create ProductChargeController.java, ProductRoleController.java, ProductBalanceController.java, ProductTransactionController.java, ProductCommunicationController.java, following the exact same pattern with String productCode in @RequestMapping and @PathVariable.
 

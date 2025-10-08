@@ -75,6 +75,18 @@ public class ProductMapper {
         return dto;
     }
     
+    public ProductInterestDTO toInterestDto(PRODUCT_INTEREST interest) {
+        if (interest == null) return null;
+        ProductInterestDTO dto = new ProductInterestDTO();
+        dto.setRateId(interest.getRateId());
+        dto.setTermInMonths(interest.getTermInMonths());
+        dto.setRateCumulative(interest.getRateCumulative());
+        dto.setRateNonCumulativeMonthly(interest.getRateNonCumulativeMonthly());
+        dto.setRateNonCumulativeQuarterly(interest.getRateNonCumulativeQuarterly());
+        dto.setRateNonCumulativeYearly(interest.getRateNonCumulativeYearly());
+        return dto;
+    }
+    
     public <T extends AuditLoggable> T fillAuditFields(T entity) {
         if (entity == null) return null;
         
