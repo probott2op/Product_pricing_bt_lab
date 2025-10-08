@@ -127,9 +127,15 @@ public class ProductServiceImpl implements ProductService {
 
             if (productType != null) {
                 PRODUCT_TYPE typeEnum = PRODUCT_TYPE.valueOf(productType.toUpperCase());
+                if (typeEnum == null) {
+                    throw new ResourceNotFoundException("Product type not found: " + productType);
+                }
                 results = productDetailsRepository.findByProductType(typeEnum);
             } else if (status != null) {
                 PRODUCT_STATUS statusEnum = PRODUCT_STATUS.valueOf(status.toUpperCase());
+                if (statusEnum == null) {
+                    throw new ResourceNotFoundException("Product status not found: " + status);
+                }
                 results = productDetailsRepository.findByStatus(statusEnum);
             } else if (startDate != null && endDate != null) {
                 try {

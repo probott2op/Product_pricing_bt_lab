@@ -2,6 +2,7 @@ package com.lab.product.controller;
 
 import com.lab.product.DTO.CreateOrUpdateProductRequestDTO;
 import com.lab.product.DTO.ProductDetailsDTO;
+import com.lab.product.entity.ENUMS.PRODUCT_TYPE;
 import com.lab.product.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

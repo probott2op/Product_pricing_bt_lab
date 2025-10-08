@@ -91,7 +91,7 @@ public class ProductMapper {
         entity.setPrgm_id("PGM001");
         
         // Set CRUD value - Using CREATE enum value
-        entity.setCrud_value(CRUD_VALUE.valueOf("CREATE"));
+        entity.setCrud_value(CRUD_VALUE.valueOf("C"));
         
         // Set UUID reference
         entity.setUUID_reference(UUID.randomUUID());

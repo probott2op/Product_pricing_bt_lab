@@ -13,6 +13,6 @@ import java.util.UUID;
 @Repository
 public interface ProductInterestRepository extends JpaRepository<PRODUCT_INTEREST, UUID> {
     Page<PRODUCT_INTEREST> findByProduct(PRODUCT_DETAILS product, Pageable pageable);
-    Optional<PRODUCT_INTEREST> findByProductAndInterestId(PRODUCT_DETAILS product, UUID interestId);
-    boolean existsByProductAndInterestId(PRODUCT_DETAILS product, UUID interestId);
+    Optional<PRODUCT_INTEREST> findByProductAndRateId(PRODUCT_DETAILS product, UUID interestId);
+    boolean existsByProductAndRateId(PRODUCT_DETAILS product, UUID interestId);
 }

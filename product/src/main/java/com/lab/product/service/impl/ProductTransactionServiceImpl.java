@@ -58,7 +58,7 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndTransactionId(product, transactionId)
+        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndId(product, transactionId)
             .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
             
         return mapper.toTransactionDto(transaction);
@@ -70,7 +70,7 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndTransactionId(product, transactionId)
+        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndId(product, transactionId)
             .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
 
         transaction.setTransactionType(PRODUCT_TRANSACTION_TYPE.valueOf(transactionDto.getTransactionType()));
@@ -89,7 +89,7 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndTransactionId(product, transactionId)
+        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndId(product, transactionId)
             .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
 
         transactionRepository.delete(transaction);

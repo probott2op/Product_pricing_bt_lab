@@ -33,6 +33,8 @@ public class ProductRuleServiceImpl implements ProductRuleService {
 
         PRODUCT_RULES rule = new PRODUCT_RULES();
         rule.setProduct(product);
+        rule.setRuleName(ruleDto.getRuleName());
+        rule.setRuleCode(ruleDto.getRuleCode());
         rule.setRuleType(ruleDto.getRuleType());
         rule.setDataType(ruleDto.getDataType());
         rule.setRuleValue(ruleDto.getRuleValue());

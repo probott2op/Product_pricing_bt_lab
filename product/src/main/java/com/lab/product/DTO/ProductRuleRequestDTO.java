@@ -10,9 +10,6 @@ import lombok.Data;
 
 @Data
 public class ProductRuleRequestDTO {
-    
-    @NotBlank(message = "Product code is required")
-    private String productCode;
 
     @NotBlank(message = "Rule code is required")
     private String ruleCode;

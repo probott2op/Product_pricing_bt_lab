@@ -13,6 +13,6 @@ import java.util.UUID;
 @Repository
 public interface ProductTransactionRepository extends JpaRepository<PRODUCT_TRANSACTION, UUID> {
     Page<PRODUCT_TRANSACTION> findByProduct(PRODUCT_DETAILS product, Pageable pageable);
-    Optional<PRODUCT_TRANSACTION> findByProductAndTransactionId(PRODUCT_DETAILS product, UUID transactionId);
-    boolean existsByProductAndTransactionId(PRODUCT_DETAILS product, UUID transactionId);
+    Optional<PRODUCT_TRANSACTION> findByProductAndId(PRODUCT_DETAILS product, UUID transactionId);
+    boolean existsByProductAndId(PRODUCT_DETAILS product, UUID transactionId);
 }
