@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductChargeServiceImpl implements ProductChargeService {
@@ -57,24 +55,24 @@ public class ProductChargeServiceImpl implements ProductChargeService {
     }
 
     @Override
-    public ProductChargeDTO getChargeById(String productCode, UUID chargeId) {
+    public ProductChargeDTO getChargeByCode(String productCode, String chargeCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeId(product, chargeId)
-            .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeId));
+        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeCode(product, chargeCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeCode));
             
         return mapper.toChargeDto(charge);
     }
 
     @Override
     @Transactional
-    public ProductChargeDTO updateCharge(String productCode, UUID chargeId, ProductChargeRequestDTO chargeDto) {
+    public ProductChargeDTO updateCharge(String productCode, String chargeCode, ProductChargeRequestDTO chargeDto) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeId(product, chargeId)
-            .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeId));
+        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeCode(product, chargeCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeCode));
 
         charge.setChargeType(chargeDto.getChargeType());
         charge.setChargeCode(chargeDto.getChargeCode());
@@ -92,12 +90,12 @@ public class ProductChargeServiceImpl implements ProductChargeService {
 
     @Override
     @Transactional
-    public void deleteCharge(String productCode, UUID chargeId) {
+    public void deleteCharge(String productCode, String chargeCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
             
-        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeId(product, chargeId)
-            .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeId));
+        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeCode(product, chargeCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeCode));
             
         chargeRepository.delete(charge);
     }

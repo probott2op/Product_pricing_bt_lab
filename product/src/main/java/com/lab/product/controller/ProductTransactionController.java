@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/products/{productCode}/transactions")
 @RequiredArgsConstructor
@@ -53,19 +51,19 @@ public class ProductTransactionController {
         return ResponseEntity.ok(productTransactionService.getTransactionsForProduct(productCode, pageable));
     }
 
-    @GetMapping("/{transactionId}")
+    @GetMapping("/{transactionCode}")
     @Operation(summary = "Get a specific transaction")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Transaction found"),
         @ApiResponse(responseCode = "404", description = "Transaction or product not found")
     })
-    public ResponseEntity<ProductTransactionDTO> getTransactionById(
+    public ResponseEntity<ProductTransactionDTO> getTransactionByCode(
             @PathVariable String productCode,
-            @PathVariable UUID transactionId) {
-        return ResponseEntity.ok(productTransactionService.getTransactionById(productCode, transactionId));
+            @PathVariable String transactionCode) {
+        return ResponseEntity.ok(productTransactionService.getTransactionByCode(productCode, transactionCode));
     }
 
-    @PutMapping("/{transactionId}")
+    @PutMapping("/{transactionCode}")
     @Operation(summary = "Update a transaction")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
@@ -74,12 +72,12 @@ public class ProductTransactionController {
     })
     public ResponseEntity<ProductTransactionDTO> updateTransaction(
             @PathVariable String productCode,
-            @PathVariable UUID transactionId,
+            @PathVariable String transactionCode,
             @Valid @RequestBody ProductTransactionRequestDTO transactionDto) {
-        return ResponseEntity.ok(productTransactionService.updateTransaction(productCode, transactionId, transactionDto));
+        return ResponseEntity.ok(productTransactionService.updateTransaction(productCode, transactionCode, transactionDto));
     }
 
-    @DeleteMapping("/{transactionId}")
+    @DeleteMapping("/{transactionCode}")
     @Operation(summary = "Delete a transaction")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
@@ -87,8 +85,8 @@ public class ProductTransactionController {
     })
     public ResponseEntity<Void> deleteTransaction(
             @PathVariable String productCode,
-            @PathVariable UUID transactionId) {
-        productTransactionService.deleteTransaction(productCode, transactionId);
+            @PathVariable String transactionCode) {
+        productTransactionService.deleteTransaction(productCode, transactionCode);
         return ResponseEntity.noContent().build();
     }
 }

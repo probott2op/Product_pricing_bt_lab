@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductBalanceServiceImpl implements ProductBalanceService {
@@ -53,24 +51,24 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
     }
 
     @Override
-    public ProductBalanceDTO getBalanceById(String productCode, UUID balanceId) {
+    public ProductBalanceDTO getBalanceByCode(String productCode, String balanceCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceId(product, balanceId)
-            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceId));
+        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceCode(product, balanceCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceCode));
             
         return mapper.toBalanceDto(balance);
     }
 
     @Override
     @Transactional
-    public ProductBalanceDTO updateBalance(String productCode, UUID balanceId, ProductBalanceRequestDTO balanceDto) {
+    public ProductBalanceDTO updateBalance(String productCode, String balanceCode, ProductBalanceRequestDTO balanceDto) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceId(product, balanceId)
-            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceId));
+        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceCode(product, balanceCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceCode));
 
         balance.setBalanceType(balanceDto.getBalanceType());
         balance.setBalanceCode(balanceDto.getBalanceCode());
@@ -84,12 +82,12 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
 
     @Override
     @Transactional
-    public void deleteBalance(String productCode, UUID balanceId) {
+    public void deleteBalance(String productCode, String balanceCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceId(product, balanceId)
-            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceId));
+        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceCode(product, balanceCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceCode));
 
         balanceRepository.delete(balance);
     }

@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/products/{productCode}/balances")
 @RequiredArgsConstructor
@@ -53,19 +51,19 @@ public class ProductBalanceController {
         return ResponseEntity.ok(productBalanceService.getBalancesForProduct(productCode, pageable));
     }
 
-    @GetMapping("/{balanceId}")
+    @GetMapping("/{balanceCode}")
     @Operation(summary = "Get a specific balance")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Balance found"),
         @ApiResponse(responseCode = "404", description = "Balance or product not found")
     })
-    public ResponseEntity<ProductBalanceDTO> getBalanceById(
+    public ResponseEntity<ProductBalanceDTO> getBalanceByCode(
             @PathVariable String productCode,
-            @PathVariable UUID balanceId) {
-        return ResponseEntity.ok(productBalanceService.getBalanceById(productCode, balanceId));
+            @PathVariable String balanceCode) {
+        return ResponseEntity.ok(productBalanceService.getBalanceByCode(productCode, balanceCode));
     }
 
-    @PutMapping("/{balanceId}")
+    @PutMapping("/{balanceCode}")
     @Operation(summary = "Update a balance")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Balance updated successfully"),
@@ -74,12 +72,12 @@ public class ProductBalanceController {
     })
     public ResponseEntity<ProductBalanceDTO> updateBalance(
             @PathVariable String productCode,
-            @PathVariable UUID balanceId,
+            @PathVariable String balanceCode,
             @Valid @RequestBody ProductBalanceRequestDTO balanceDto) {
-        return ResponseEntity.ok(productBalanceService.updateBalance(productCode, balanceId, balanceDto));
+        return ResponseEntity.ok(productBalanceService.updateBalance(productCode, balanceCode, balanceDto));
     }
 
-    @DeleteMapping("/{balanceId}")
+    @DeleteMapping("/{balanceCode}")
     @Operation(summary = "Delete a balance")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Balance deleted successfully"),
@@ -87,8 +85,8 @@ public class ProductBalanceController {
     })
     public ResponseEntity<Void> deleteBalance(
             @PathVariable String productCode,
-            @PathVariable UUID balanceId) {
-        productBalanceService.deleteBalance(productCode, balanceId);
+            @PathVariable String balanceCode) {
+        productBalanceService.deleteBalance(productCode, balanceCode);
         return ResponseEntity.noContent().build();
     }
 }

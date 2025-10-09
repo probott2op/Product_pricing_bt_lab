@@ -17,10 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
-@RequestMapping("/api/products/{productId}/communications")
+@RequestMapping("/api/products/{productCode}/communications")
 @RequiredArgsConstructor
 @Tag(name = "Product Communications", description = "Product communications management endpoints")
 public class ProductCommunicationController {
@@ -36,9 +34,9 @@ public class ProductCommunicationController {
         @ApiResponse(responseCode = "400", description = "Invalid communication data")
     })
     public ResponseEntity<ProductCommunicationDTO> addCommunication(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @Valid @RequestBody ProductCommunicationRequestDTO communicationDto) {
-        return new ResponseEntity<>(productCommunicationService.addCommunicationToProduct(productId, communicationDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(productCommunicationService.addCommunicationToProduct(productCode, communicationDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -48,24 +46,24 @@ public class ProductCommunicationController {
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<Page<ProductCommunicationDTO>> getCommunications(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             Pageable pageable) {
-        return ResponseEntity.ok(productCommunicationService.getCommunicationsForProduct(productId, pageable));
+        return ResponseEntity.ok(productCommunicationService.getCommunicationsForProduct(productCode, pageable));
     }
 
-    @GetMapping("/{communicationId}")
+    @GetMapping("/{commCode}")
     @Operation(summary = "Get a specific communication")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Communication found"),
         @ApiResponse(responseCode = "404", description = "Communication or product not found")
     })
-    public ResponseEntity<ProductCommunicationDTO> getCommunicationById(
-            @PathVariable UUID productId,
-            @PathVariable UUID communicationId) {
-        return ResponseEntity.ok(productCommunicationService.getCommunicationById(productId, communicationId));
+    public ResponseEntity<ProductCommunicationDTO> getCommunicationByCode(
+            @PathVariable String productCode,
+            @PathVariable String commCode) {
+        return ResponseEntity.ok(productCommunicationService.getCommunicationByCode(productCode, commCode));
     }
 
-    @PutMapping("/{communicationId}")
+    @PutMapping("/{commCode}")
     @Operation(summary = "Update a communication")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Communication updated successfully"),
@@ -73,22 +71,22 @@ public class ProductCommunicationController {
         @ApiResponse(responseCode = "400", description = "Invalid communication data")
     })
     public ResponseEntity<ProductCommunicationDTO> updateCommunication(
-            @PathVariable UUID productId,
-            @PathVariable UUID communicationId,
+            @PathVariable String productCode,
+            @PathVariable String commCode,
             @Valid @RequestBody ProductCommunicationRequestDTO communicationDto) {
-        return ResponseEntity.ok(productCommunicationService.updateCommunication(productId, communicationId, communicationDto));
+        return ResponseEntity.ok(productCommunicationService.updateCommunication(productCode, commCode, communicationDto));
     }
 
-    @DeleteMapping("/{communicationId}")
+    @DeleteMapping("/{commCode}")
     @Operation(summary = "Delete a communication")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Communication deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Communication or product not found")
     })
     public ResponseEntity<Void> deleteCommunication(
-            @PathVariable UUID productId,
-            @PathVariable UUID communicationId) {
-        productCommunicationService.deleteCommunication(productId, communicationId);
+            @PathVariable String productCode,
+            @PathVariable String commCode) {
+        productCommunicationService.deleteCommunication(productCode, commCode);
         return ResponseEntity.noContent().build();
     }
 }

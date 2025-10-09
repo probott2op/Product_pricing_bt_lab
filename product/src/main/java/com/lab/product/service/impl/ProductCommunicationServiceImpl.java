@@ -19,8 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductCommunicationServiceImpl implements ProductCommunicationService {
@@ -31,12 +29,13 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
 
     @Override
     @Transactional
-    public ProductCommunicationDTO addCommunicationToProduct(UUID productId, ProductCommunicationRequestDTO communicationDto) {
-        PRODUCT_DETAILS product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+    public ProductCommunicationDTO addCommunicationToProduct(String productCode, ProductCommunicationRequestDTO communicationDto) {
+        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
         PRODUCT_COMMUNICATION communication = new PRODUCT_COMMUNICATION();
         communication.setProduct(product);
+        communication.setCommCode(communicationDto.getCommunicationCode());
         communication.setCommunicationType(PRODUCT_COMM_TYPE.valueOf(communicationDto.getCommunicationType()));
         // Set default values for required fields
         communication.setChannel(PRODUCT_COMM_CHANNEL.EMAIL); // Default to EMAIL
@@ -49,9 +48,9 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ProductCommunicationDTO> getCommunicationsForProduct(UUID productId, Pageable pageable) {
-        PRODUCT_DETAILS product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+    public Page<ProductCommunicationDTO> getCommunicationsForProduct(String productCode, Pageable pageable) {
+        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
         return communicationRepository.findByProduct(product, pageable)
                 .map(productMapper::toCommunicationDto);
@@ -59,33 +58,26 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
 
     @Override
     @Transactional(readOnly = true)
-    public ProductCommunicationDTO getCommunicationById(UUID productId, UUID communicationId) {
-        PRODUCT_DETAILS product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+    public ProductCommunicationDTO getCommunicationByCode(String productCode, String commCode) {
+        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_COMMUNICATION communication = communicationRepository.findById(communicationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Communication not found with id: " + communicationId));
-
-        if (!communication.getProduct().equals(product)) {
-            throw new ResourceNotFoundException("Communication not found for this product");
-        }
+        PRODUCT_COMMUNICATION communication = communicationRepository.findByProductAndCommCode(product, commCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Communication not found: " + commCode));
 
         return productMapper.toCommunicationDto(communication);
     }
 
     @Override
     @Transactional
-    public ProductCommunicationDTO updateCommunication(UUID productId, UUID communicationId, ProductCommunicationRequestDTO communicationDto) {
-        PRODUCT_DETAILS product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+    public ProductCommunicationDTO updateCommunication(String productCode, String commCode, ProductCommunicationRequestDTO communicationDto) {
+        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_COMMUNICATION communication = communicationRepository.findById(communicationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Communication not found with id: " + communicationId));
+        PRODUCT_COMMUNICATION communication = communicationRepository.findByProductAndCommCode(product, commCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Communication not found: " + commCode));
 
-        if (!communication.getProduct().equals(product)) {
-            throw new ResourceNotFoundException("Communication not found for this product");
-        }
-
+        communication.setCommCode(communicationDto.getCommunicationCode());
         communication.setCommunicationType(PRODUCT_COMM_TYPE.valueOf(communicationDto.getCommunicationType()));
         communication.setEvent(communicationDto.getCommunicationCode());
         communication.setTemplate(communicationDto.getTemplateContent());
@@ -96,16 +88,12 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
 
     @Override
     @Transactional
-    public void deleteCommunication(UUID productId, UUID communicationId) {
-        PRODUCT_DETAILS product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + productId));
+    public void deleteCommunication(String productCode, String commCode) {
+        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_COMMUNICATION communication = communicationRepository.findById(communicationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Communication not found with id: " + communicationId));
-
-        if (!communication.getProduct().equals(product)) {
-            throw new ResourceNotFoundException("Communication not found for this product");
-        }
+        PRODUCT_COMMUNICATION communication = communicationRepository.findByProductAndCommCode(product, commCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Communication not found: " + commCode));
 
         communicationRepository.delete(communication);
     }

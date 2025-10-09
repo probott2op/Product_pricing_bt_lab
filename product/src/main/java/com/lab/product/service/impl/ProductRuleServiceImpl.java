@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductRuleServiceImpl implements ProductRuleService {
@@ -57,29 +55,30 @@ public class ProductRuleServiceImpl implements ProductRuleService {
     }
 
     @Override
-    public ProductRuleDTO getRuleById(String productCode, UUID ruleId) {
+    public ProductRuleDTO getRuleByCode(String productCode, String ruleCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_RULES rule = ruleRepository.findByProductAndRuleId(product, ruleId)
-            .orElseThrow(() -> new ResourceNotFoundException("Rule not found: " + ruleId));
+        PRODUCT_RULES rule = ruleRepository.findByProductAndRuleCode(product, ruleCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Rule not found: " + ruleCode));
             
         return mapper.toRuleDto(rule);
     }
 
     @Override
     @Transactional
-    public ProductRuleDTO updateRule(String productCode, UUID ruleId, ProductRuleRequestDTO ruleDto) {
+    public ProductRuleDTO updateRule(String productCode, String ruleCode, ProductRuleRequestDTO ruleDto) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_RULES rule = ruleRepository.findByProductAndRuleId(product, ruleId)
-            .orElseThrow(() -> new ResourceNotFoundException("Rule not found: " + ruleId));
+        PRODUCT_RULES rule = ruleRepository.findByProductAndRuleCode(product, ruleCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Rule not found: " + ruleCode));
 
         rule.setRuleType(ruleDto.getRuleType());
         rule.setDataType(ruleDto.getDataType());
         rule.setRuleValue(ruleDto.getRuleValue());
         rule.setValidationType(ruleDto.getValidationType());
+        rule.setRuleCode(ruleDto.getRuleCode());
         
         // Update audit fields
         mapper.fillAuditFields(rule);
@@ -90,12 +89,12 @@ public class ProductRuleServiceImpl implements ProductRuleService {
 
     @Override
     @Transactional
-    public void deleteRule(String productCode, UUID ruleId) {
+    public void deleteRule(String productCode, String ruleCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_RULES rule = ruleRepository.findByProductAndRuleId(product, ruleId)
-            .orElseThrow(() -> new ResourceNotFoundException("Rule not found: " + ruleId));
+        PRODUCT_RULES rule = ruleRepository.findByProductAndRuleCode(product, ruleCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Rule not found: " + ruleCode));
 
         ruleRepository.delete(rule);
     }

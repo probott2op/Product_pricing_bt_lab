@@ -16,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/products/{productCode}/rules")
 @RequiredArgsConstructor
@@ -52,19 +50,19 @@ public class ProductRuleController {
         return ResponseEntity.ok(productRuleService.getRulesForProduct(productCode, pageable));
     }
 
-    @GetMapping("/{ruleId}")
+    @GetMapping("/{ruleCode}")
     @Operation(summary = "Get a specific rule")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Rule found"),
         @ApiResponse(responseCode = "404", description = "Rule or product not found")
     })
-    public ResponseEntity<ProductRuleDTO> getRuleById(
+    public ResponseEntity<ProductRuleDTO> getRuleByCode(
             @PathVariable String productCode,
-            @PathVariable UUID ruleId) {
-        return ResponseEntity.ok(productRuleService.getRuleById(productCode, ruleId));
+            @PathVariable String ruleCode) {
+        return ResponseEntity.ok(productRuleService.getRuleByCode(productCode, ruleCode));
     }
 
-    @PutMapping("/{ruleId}")
+    @PutMapping("/{ruleCode}")
     @Operation(summary = "Update a rule")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Rule updated successfully"),
@@ -73,12 +71,12 @@ public class ProductRuleController {
     })
     public ResponseEntity<ProductRuleDTO> updateRule(
             @PathVariable String productCode,
-            @PathVariable UUID ruleId,
+            @PathVariable String ruleCode,
             @Valid @RequestBody ProductRuleRequestDTO ruleDto) {
-        return ResponseEntity.ok(productRuleService.updateRule(productCode, ruleId, ruleDto));
+        return ResponseEntity.ok(productRuleService.updateRule(productCode, ruleCode, ruleDto));
     }
 
-    @DeleteMapping("/{ruleId}")
+    @DeleteMapping("/{ruleCode}")
     @Operation(summary = "Delete a rule")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Rule deleted successfully"),
@@ -86,8 +84,8 @@ public class ProductRuleController {
     })
     public ResponseEntity<Void> deleteRule(
             @PathVariable String productCode,
-            @PathVariable UUID ruleId) {
-        productRuleService.deleteRule(productCode, ruleId);
+            @PathVariable String ruleCode) {
+        productRuleService.deleteRule(productCode, ruleCode);
         return ResponseEntity.noContent().build();
     }
 }

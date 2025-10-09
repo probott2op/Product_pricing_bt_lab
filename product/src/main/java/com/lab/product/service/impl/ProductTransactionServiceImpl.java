@@ -16,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductTransactionServiceImpl implements ProductTransactionService {
@@ -34,6 +32,7 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
 
         PRODUCT_TRANSACTION transaction = new PRODUCT_TRANSACTION();
         transaction.setProduct(product);
+        transaction.setTransactionCode(transactionDto.getTransactionCode());
         transaction.setTransactionType(PRODUCT_TRANSACTION_TYPE.valueOf(transactionDto.getTransactionType()));
         transaction.setAllowed(transactionDto.isActive());
         
@@ -54,25 +53,26 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
     }
 
     @Override
-    public ProductTransactionDTO getTransactionById(String productCode, UUID transactionId) {
+    public ProductTransactionDTO getTransactionByCode(String productCode, String transactionCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndId(product, transactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndTransactionCode(product, transactionCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionCode));
             
         return mapper.toTransactionDto(transaction);
     }
 
     @Override
     @Transactional
-    public ProductTransactionDTO updateTransaction(String productCode, UUID transactionId, ProductTransactionRequestDTO transactionDto) {
+    public ProductTransactionDTO updateTransaction(String productCode, String transactionCode, ProductTransactionRequestDTO transactionDto) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndId(product, transactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndTransactionCode(product, transactionCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionCode));
 
+        transaction.setTransactionCode(transactionDto.getTransactionCode());
         transaction.setTransactionType(PRODUCT_TRANSACTION_TYPE.valueOf(transactionDto.getTransactionType()));
         transaction.setAllowed(transactionDto.isActive());
         
@@ -85,12 +85,12 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
 
     @Override
     @Transactional
-    public void deleteTransaction(String productCode, UUID transactionId) {
+    public void deleteTransaction(String productCode, String transactionCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndId(product, transactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionId));
+        PRODUCT_TRANSACTION transaction = transactionRepository.findByProductAndTransactionCode(product, transactionCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Transaction not found: " + transactionCode));
 
         transactionRepository.delete(transaction);
     }

@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/products/{productCode}/charges")
 @RequiredArgsConstructor
@@ -53,19 +51,19 @@ public class ProductChargeController {
         return ResponseEntity.ok(productChargeService.getChargesForProduct(productCode, pageable));
     }
 
-    @GetMapping("/{chargeId}")
+    @GetMapping("/{chargeCode}")
     @Operation(summary = "Get a specific charge")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Charge found"),
         @ApiResponse(responseCode = "404", description = "Charge or product not found")
     })
-    public ResponseEntity<ProductChargeDTO> getChargeById(
+    public ResponseEntity<ProductChargeDTO> getChargeByCode(
             @PathVariable String productCode,
-            @PathVariable UUID chargeId) {
-        return ResponseEntity.ok(productChargeService.getChargeById(productCode, chargeId));
+            @PathVariable String chargeCode) {
+        return ResponseEntity.ok(productChargeService.getChargeByCode(productCode, chargeCode));
     }
 
-    @PutMapping("/{chargeId}")
+    @PutMapping("/{chargeCode}")
     @Operation(summary = "Update a charge")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Charge updated successfully"),
@@ -74,12 +72,12 @@ public class ProductChargeController {
     })
     public ResponseEntity<ProductChargeDTO> updateCharge(
             @PathVariable String productCode,
-            @PathVariable UUID chargeId,
+            @PathVariable String chargeCode,
             @Valid @RequestBody ProductChargeRequestDTO chargeDto) {
-        return ResponseEntity.ok(productChargeService.updateCharge(productCode, chargeId, chargeDto));
+        return ResponseEntity.ok(productChargeService.updateCharge(productCode, chargeCode, chargeDto));
     }
 
-    @DeleteMapping("/{chargeId}")
+    @DeleteMapping("/{chargeCode}")
     @Operation(summary = "Delete a charge")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Charge deleted successfully"),
@@ -87,8 +85,8 @@ public class ProductChargeController {
     })
     public ResponseEntity<Void> deleteCharge(
             @PathVariable String productCode,
-            @PathVariable UUID chargeId) {
-        productChargeService.deleteCharge(productCode, chargeId);
+            @PathVariable String chargeCode) {
+        productChargeService.deleteCharge(productCode, chargeCode);
         return ResponseEntity.noContent().build();
     }
 }
