@@ -44,18 +44,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts(pageable));
     }
 
-    @GetMapping("/{productId}")
-    @Operation(summary = "Get product by ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product found"),
-        @ApiResponse(responseCode = "404", description = "Product not found"),
-        @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<ProductDetailsDTO> getProductById(@PathVariable UUID productId) {
-        return ResponseEntity.ok(productService.getProductById(productId));
-    }
-
-    @GetMapping("/code/{productCode}")
+    @GetMapping("/{productCode}")
     @Operation(summary = "Get product by code")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Product found"),
@@ -66,18 +55,18 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductByCode(productCode));
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping("/{productCode}")
     @Operation(summary = "Update a product")
     public ResponseEntity<ProductDetailsDTO> updateProduct(
-            @PathVariable UUID productId,
+            @PathVariable String productCode,
             @Valid @RequestBody CreateOrUpdateProductRequestDTO requestDTO) {
-        return ResponseEntity.ok(productService.updateProduct(productId, requestDTO));
+        return ResponseEntity.ok(productService.updateProduct(productCode, requestDTO));
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("/{productCode}")
     @Operation(summary = "Delete a product")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
-        productService.deleteProduct(productId);
+    public ResponseEntity<Void> deleteProduct(@PathVariable String productCode) {
+        productService.deleteProduct(productCode);
         return ResponseEntity.noContent().build();
     }
 

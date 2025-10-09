@@ -76,15 +76,15 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductDetailsDTO updateProduct(UUID productId, CreateOrUpdateProductRequestDTO requestDTO) {
-        if (productId == null) {
-            throw new ValidationException("Product ID cannot be null");
+    public ProductDetailsDTO updateProduct(String productCode, CreateOrUpdateProductRequestDTO requestDTO) {
+        if (productCode == null || productCode.trim().isEmpty()) {
+            throw new ValidationException("Product code cannot be null or empty");
         }
         
         validateProductRequest(requestDTO);
         
-        PRODUCT_DETAILS existing = productDetailsRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productId));
+        PRODUCT_DETAILS existing = productDetailsRepository.findByProductCode(productCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
         mapper.updateEntityFromDto(existing, requestDTO);
         existing = mapper.fillAuditFields(existing);
@@ -169,9 +169,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct(UUID productId) {
-        PRODUCT_DETAILS product = productDetailsRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productId));
+    public void deleteProduct(String productCode) {
+        PRODUCT_DETAILS product = productDetailsRepository.findByProductCode(productCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         productDetailsRepository.delete(product);
     }
 

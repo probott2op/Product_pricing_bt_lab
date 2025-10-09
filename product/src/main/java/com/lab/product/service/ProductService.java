@@ -10,10 +10,10 @@ import java.util.UUID;
 
 public interface ProductService {
     ProductDetailsDTO createProduct(CreateOrUpdateProductRequestDTO requestDTO);
-    ProductDetailsDTO updateProduct(UUID productId, CreateOrUpdateProductRequestDTO requestDTO);
+    ProductDetailsDTO updateProduct(String productCode, CreateOrUpdateProductRequestDTO requestDTO);
     ProductDetailsDTO getProductById(UUID productId);
     ProductDetailsDTO getProductByCode(String productCode);
     Page<ProductDetailsDTO> getAllProducts(Pageable pageable);
-    void deleteProduct(UUID productId);
+    void deleteProduct(String productCode);
     List<ProductDetailsDTO> searchProducts(String productType, String status, String startDate, String endDate);
 }
