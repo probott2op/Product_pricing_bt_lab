@@ -32,6 +32,7 @@ public class ProductChargeServiceImpl implements ProductChargeService {
         PRODUCT_CHARGES charge = new PRODUCT_CHARGES();
         charge.setProduct(product);
         charge.setChargeType(chargeDto.getChargeType());
+        charge.setChargeName(chargeDto.getChargeName());
         charge.setChargeCode(chargeDto.getChargeCode());
         charge.setChargeValue(chargeDto.getChargeValue());
         charge.setCalculationType(chargeDto.getCalculationType());

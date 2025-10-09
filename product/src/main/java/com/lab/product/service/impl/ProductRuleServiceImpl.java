@@ -25,9 +25,9 @@ public class ProductRuleServiceImpl implements ProductRuleService {
 
     @Override
     @Transactional
-    public ProductRuleDTO addRuleToProduct(String productId, ProductRuleRequestDTO ruleDto) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productId)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productId));
+    public ProductRuleDTO addRuleToProduct(String productCode, ProductRuleRequestDTO ruleDto) {
+        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
         PRODUCT_RULES rule = new PRODUCT_RULES();
         rule.setProduct(product);

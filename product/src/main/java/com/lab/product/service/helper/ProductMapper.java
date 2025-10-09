@@ -48,6 +48,8 @@ public class ProductMapper {
     public ProductRuleDTO toRuleDto(PRODUCT_RULES rule) {
         if (rule == null) return null;
         ProductRuleDTO dto = new ProductRuleDTO();
+        dto.setRuleCode(rule.getRuleCode());
+        dto.setRuleName(rule.getRuleName());
         dto.setRuleId(rule.getRuleId());
         dto.setRuleType(rule.getRuleType());
         dto.setDataType(rule.getDataType());
