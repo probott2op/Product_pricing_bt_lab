@@ -16,8 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductRoleServiceImpl implements ProductRoleService {
@@ -34,6 +32,7 @@ public class ProductRoleServiceImpl implements ProductRoleService {
 
         PRODUCT_ROLE role = new PRODUCT_ROLE();
         role.setProduct(product);
+        role.setRoleCode(roleDto.getRoleCode());
         role.setRoleType(PRODUCT_ROLE_TYPE.valueOf(roleDto.getRoleType()));
         role.setMandatory(roleDto.isActive());
         role.setMaxCount(1);
@@ -56,25 +55,26 @@ public class ProductRoleServiceImpl implements ProductRoleService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductRoleDTO getRoleById(String productCode, UUID roleId) {
+    public ProductRoleDTO getRoleByCode(String productCode, String roleCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
             
-        PRODUCT_ROLE role = roleRepository.findByProductAndRoleId(product, roleId)
-            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleId));
+        PRODUCT_ROLE role = roleRepository.findByProductAndRoleCode(product, roleCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleCode));
             
         return mapper.toRoleDto(role);
     }
 
     @Override
     @Transactional
-    public ProductRoleDTO updateRole(String productCode, UUID roleId, ProductRoleRequestDTO roleDto) {
+    public ProductRoleDTO updateRole(String productCode, String roleCode, ProductRoleRequestDTO roleDto) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
             
-        PRODUCT_ROLE role = roleRepository.findByProductAndRoleId(product, roleId)
-            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleId));
+        PRODUCT_ROLE role = roleRepository.findByProductAndRoleCode(product, roleCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleCode));
             
+        role.setRoleCode(roleDto.getRoleCode());
         role.setRoleType(PRODUCT_ROLE_TYPE.valueOf(roleDto.getRoleType()));
         role.setMandatory(roleDto.isActive());
         role.setMaxCount(1);
@@ -88,12 +88,12 @@ public class ProductRoleServiceImpl implements ProductRoleService {
 
     @Override
     @Transactional
-    public void deleteRole(String productCode, UUID roleId) {
+    public void deleteRole(String productCode, String roleCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_ROLE role = roleRepository.findByProductAndRoleId(product, roleId)
-            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleId));
+        PRODUCT_ROLE role = roleRepository.findByProductAndRoleCode(product, roleCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleCode));
             
         roleRepository.delete(role);
     }

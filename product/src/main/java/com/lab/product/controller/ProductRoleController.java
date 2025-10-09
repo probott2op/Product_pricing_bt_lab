@@ -17,8 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/api/products/{productCode}/roles")
 @RequiredArgsConstructor
@@ -53,19 +51,19 @@ public class ProductRoleController {
         return ResponseEntity.ok(productRoleService.getRolesForProduct(productCode, pageable));
     }
 
-    @GetMapping("/{roleId}")
+    @GetMapping("/{roleCode}")
     @Operation(summary = "Get a specific role")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Role found"),
         @ApiResponse(responseCode = "404", description = "Role or product not found")
     })
-    public ResponseEntity<ProductRoleDTO> getRoleById(
+    public ResponseEntity<ProductRoleDTO> getRoleByCode(
             @PathVariable String productCode,
-            @PathVariable UUID roleId) {
-        return ResponseEntity.ok(productRoleService.getRoleById(productCode, roleId));
+            @PathVariable String roleCode) {
+        return ResponseEntity.ok(productRoleService.getRoleByCode(productCode, roleCode));
     }
 
-    @PutMapping("/{roleId}")
+    @PutMapping("/{roleCode}")
     @Operation(summary = "Update a role")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Role updated successfully"),
@@ -74,12 +72,12 @@ public class ProductRoleController {
     })
     public ResponseEntity<ProductRoleDTO> updateRole(
             @PathVariable String productCode,
-            @PathVariable UUID roleId,
+            @PathVariable String roleCode,
             @Valid @RequestBody ProductRoleRequestDTO roleDto) {
-        return ResponseEntity.ok(productRoleService.updateRole(productCode, roleId, roleDto));
+        return ResponseEntity.ok(productRoleService.updateRole(productCode, roleCode, roleDto));
     }
 
-    @DeleteMapping("/{roleId}")
+    @DeleteMapping("/{roleCode}")
     @Operation(summary = "Delete a role")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Role deleted successfully"),
@@ -87,8 +85,8 @@ public class ProductRoleController {
     })
     public ResponseEntity<Void> deleteRole(
             @PathVariable String productCode,
-            @PathVariable UUID roleId) {
-        productRoleService.deleteRole(productCode, roleId);
+            @PathVariable String roleCode) {
+        productRoleService.deleteRole(productCode, roleCode);
         return ResponseEntity.noContent().build();
     }
 }

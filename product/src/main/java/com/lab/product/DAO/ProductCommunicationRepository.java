@@ -17,5 +17,7 @@ public interface ProductCommunicationRepository extends JpaRepository<PRODUCT_CO
     Page<PRODUCT_COMMUNICATION> findByProduct(PRODUCT_DETAILS product, Pageable pageable);
     List<PRODUCT_COMMUNICATION> findByProduct(PRODUCT_DETAILS product);
     List<PRODUCT_COMMUNICATION> findByProductAndCommunicationType(PRODUCT_DETAILS product, PRODUCT_COMM_TYPE communicationType);
+    java.util.Optional<PRODUCT_COMMUNICATION> findByProductAndCommCode(PRODUCT_DETAILS product, String commCode);
     boolean existsByProduct(PRODUCT_DETAILS product);
+    boolean existsByProductAndCommCode(PRODUCT_DETAILS product, String commCode);
 }

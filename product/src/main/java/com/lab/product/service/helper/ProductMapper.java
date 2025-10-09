@@ -39,6 +39,7 @@ public class ProductMapper {
         if (role == null) return null;
         ProductRoleDTO dto = new ProductRoleDTO();
         dto.setRoleId(role.getRoleId());
+        dto.setRoleCode(role.getRoleCode());
         dto.setRoleType(role.getRoleType());
         dto.setRoleName(role.getRoleType() != null ? role.getRoleType().name() : null);
         return dto;
@@ -59,6 +60,7 @@ public class ProductMapper {
         if (transaction == null) return null;
         ProductTransactionDTO dto = new ProductTransactionDTO();
         dto.setTransactionId(transaction.getId());
+        dto.setTransactionCode(transaction.getTransactionCode());
         dto.setTransactionType(transaction.getTransactionType());
         dto.setAmountLimit(null); // Set to null or a default value as entity doesn't have this field
         return dto;
@@ -68,6 +70,7 @@ public class ProductMapper {
         if (communication == null) return null;
         ProductCommunicationDTO dto = new ProductCommunicationDTO();
         dto.setCommId(communication.getCommId());
+        dto.setCommCode(communication.getCommCode());
         dto.setCommunicationType(communication.getCommunicationType());
         dto.setChannel(communication.getChannel());
         dto.setEvent(communication.getEvent());
@@ -79,6 +82,7 @@ public class ProductMapper {
         if (interest == null) return null;
         ProductInterestDTO dto = new ProductInterestDTO();
         dto.setRateId(interest.getRateId());
+        dto.setRateCode(interest.getRateCode());
         dto.setTermInMonths(interest.getTermInMonths());
         dto.setRateCumulative(interest.getRateCumulative());
         dto.setRateNonCumulativeMonthly(interest.getRateNonCumulativeMonthly());
@@ -154,6 +158,7 @@ public class ProductMapper {
             dto.setProductRoles(product.getProductRoles().stream().map(r -> {
                 ProductRoleDTO pr = new ProductRoleDTO();
                 pr.setRoleId(r.getRoleId());
+                pr.setRoleCode(r.getRoleCode());
                 pr.setRoleType(r.getRoleType());
                 pr.setRoleName(r.getRoleType() != null ? r.getRoleType().name() : null);
                 return pr;
@@ -165,6 +170,7 @@ public class ProductMapper {
             dto.setProductTransactions(product.getProductTransactions().stream().map(t -> {
                 ProductTransactionDTO pt = new ProductTransactionDTO();
                 pt.setTransactionId(t.getId());
+                pt.setTransactionCode(t.getTransactionCode());
                 pt.setTransactionType(t.getTransactionType());
                 pt.setAmountLimit(null);
                 return pt;
@@ -187,6 +193,7 @@ public class ProductMapper {
             dto.setProductCommunications(product.getProductCommunications().stream().map(c -> {
                 ProductCommunicationDTO pc = new ProductCommunicationDTO();
                 pc.setCommId(c.getCommId());
+                pc.setCommCode(c.getCommCode());
                 pc.setCommunicationType(c.getCommunicationType());
                 pc.setChannel(c.getChannel());
                 pc.setEvent(c.getEvent());

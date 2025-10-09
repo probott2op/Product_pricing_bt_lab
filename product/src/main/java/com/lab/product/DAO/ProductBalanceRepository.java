@@ -14,5 +14,7 @@ import java.util.UUID;
 public interface ProductBalanceRepository extends JpaRepository<PRODUCT_BALANCE, UUID> {
     Page<PRODUCT_BALANCE> findByProduct(PRODUCT_DETAILS product, Pageable pageable);
     Optional<PRODUCT_BALANCE> findByProductAndBalanceId(PRODUCT_DETAILS product, UUID balanceId);
+    Optional<PRODUCT_BALANCE> findByProductAndBalanceCode(PRODUCT_DETAILS product, String balanceCode);
     boolean existsByProductAndBalanceId(PRODUCT_DETAILS product, UUID balanceId);
+    boolean existsByProductAndBalanceCode(PRODUCT_DETAILS product, String balanceCode);
 }

@@ -14,5 +14,7 @@ import java.util.UUID;
 public interface ProductTransactionRepository extends JpaRepository<PRODUCT_TRANSACTION, UUID> {
     Page<PRODUCT_TRANSACTION> findByProduct(PRODUCT_DETAILS product, Pageable pageable);
     Optional<PRODUCT_TRANSACTION> findByProductAndId(PRODUCT_DETAILS product, UUID transactionId);
+    Optional<PRODUCT_TRANSACTION> findByProductAndTransactionCode(PRODUCT_DETAILS product, String transactionCode);
     boolean existsByProductAndId(PRODUCT_DETAILS product, UUID transactionId);
+    boolean existsByProductAndTransactionCode(PRODUCT_DETAILS product, String transactionCode);
 }

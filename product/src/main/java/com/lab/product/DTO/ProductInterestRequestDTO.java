@@ -9,6 +9,9 @@ import java.math.BigDecimal;
 
 @Data
 public class ProductInterestRequestDTO {
+    @NotNull(message = "Rate code is required")
+    private String rateCode;
+    
     @NotNull(message = "Term in months is required")
     @Positive(message = "Term in months must be positive")
     private Integer termInMonths;

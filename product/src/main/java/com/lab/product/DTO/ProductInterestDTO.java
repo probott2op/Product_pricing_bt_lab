@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 public class ProductInterestDTO {
     private UUID rateId;
+    private String rateCode;
     private Integer termInMonths;
     private BigDecimal rateCumulative;
     private BigDecimal rateNonCumulativeMonthly;

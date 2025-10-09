@@ -21,6 +21,9 @@ public class PRODUCT_TRANSACTION extends AuditLoggable {
     @JoinColumn(name = "product_id", nullable = false)
     private PRODUCT_DETAILS product;
 
+    @Column(nullable = false, unique = true, length = 50)
+    private String transactionCode; // e.g., "TXN_DEPOSIT", "TXN_WITHDRAWAL"
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PRODUCT_TRANSACTION_TYPE transactionType;

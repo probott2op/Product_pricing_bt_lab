@@ -15,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class ProductInterestServiceImpl implements ProductInterestService {
@@ -33,6 +31,7 @@ public class ProductInterestServiceImpl implements ProductInterestService {
 
         PRODUCT_INTEREST interest = new PRODUCT_INTEREST();
         interest.setProduct(product);
+        interest.setRateCode(interestDto.getRateCode());
         interest.setTermInMonths(interestDto.getTermInMonths());
         interest.setRateCumulative(interestDto.getRateCumulative());
         interest.setRateNonCumulativeMonthly(interestDto.getRateNonCumulativeMonthly());
@@ -57,25 +56,26 @@ public class ProductInterestServiceImpl implements ProductInterestService {
 
     @Override
     @Transactional(readOnly = true)
-    public ProductInterestDTO getInterestRateById(String productCode, UUID rateId) {
+    public ProductInterestDTO getInterestRateByCode(String productCode, String rateCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
             
-        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateId(product, rateId)
-            .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateId));
+        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateCode(product, rateCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateCode));
             
         return mapper.toInterestDto(interest);
     }
 
     @Override
     @Transactional
-    public ProductInterestDTO updateInterestRate(String productCode, UUID rateId, ProductInterestRequestDTO interestDto) {
+    public ProductInterestDTO updateInterestRate(String productCode, String rateCode, ProductInterestRequestDTO interestDto) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
             
-        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateId(product, rateId)
-            .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateId));
+        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateCode(product, rateCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateCode));
             
+        interest.setRateCode(interestDto.getRateCode());
         interest.setTermInMonths(interestDto.getTermInMonths());
         interest.setRateCumulative(interestDto.getRateCumulative());
         interest.setRateNonCumulativeMonthly(interestDto.getRateNonCumulativeMonthly());
@@ -91,12 +91,12 @@ public class ProductInterestServiceImpl implements ProductInterestService {
 
     @Override
     @Transactional
-    public void deleteInterestRate(String productCode, UUID rateId) {
+    public void deleteInterestRate(String productCode, String rateCode) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateId(product, rateId)
-            .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateId));
+        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateCode(product, rateCode)
+            .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateCode));
             
         interestRepository.delete(interest);
     }

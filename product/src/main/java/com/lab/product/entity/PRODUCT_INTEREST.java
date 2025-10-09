@@ -23,7 +23,10 @@ public class PRODUCT_INTEREST extends AuditLoggable {
     @JoinColumn(name = "product_id", nullable = false)
     private PRODUCT_DETAILS product;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
+    private String rateCode; // e.g., "RATE_12M", "RATE_36M"
+
+    @Column(nullable = false)
     private Integer termInMonths; // e.g., 12, 24, 36, 60
 
     // Base rate for cumulative option (paid at maturity)

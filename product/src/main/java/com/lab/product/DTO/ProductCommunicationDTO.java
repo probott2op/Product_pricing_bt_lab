@@ -9,6 +9,7 @@ import java.util.UUID;
 @Data
 public class ProductCommunicationDTO {
     private UUID commId;
+    private String commCode;
     private PRODUCT_COMM_TYPE communicationType;
     private PRODUCT_COMM_CHANNEL channel;
     private String event;

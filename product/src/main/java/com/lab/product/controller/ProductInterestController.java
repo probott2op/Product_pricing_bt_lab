@@ -53,19 +53,19 @@ public class ProductInterestController {
         return ResponseEntity.ok(productInterestService.getInterestRatesForProduct(productCode, pageable));
     }
 
-    @GetMapping("/{rateId}")
+    @GetMapping("/{rateCode}")
     @Operation(summary = "Get a specific interest rate")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Interest rate found"),
         @ApiResponse(responseCode = "404", description = "Interest rate or product not found")
     })
-    public ResponseEntity<ProductInterestDTO> getInterestRateById(
+    public ResponseEntity<ProductInterestDTO> getInterestRateByCode(
             @PathVariable String productCode,
-            @PathVariable UUID rateId) {
-        return ResponseEntity.ok(productInterestService.getInterestRateById(productCode, rateId));
+            @PathVariable String rateCode) {
+        return ResponseEntity.ok(productInterestService.getInterestRateByCode(productCode, rateCode));
     }
 
-    @PutMapping("/{rateId}")
+    @PutMapping("/{rateCode}")
     @Operation(summary = "Update an interest rate")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Interest rate updated successfully"),
@@ -74,12 +74,12 @@ public class ProductInterestController {
     })
     public ResponseEntity<ProductInterestDTO> updateInterestRate(
             @PathVariable String productCode,
-            @PathVariable UUID rateId,
+            @PathVariable String rateCode,
             @Valid @RequestBody ProductInterestRequestDTO interestDto) {
-        return ResponseEntity.ok(productInterestService.updateInterestRate(productCode, rateId, interestDto));
+        return ResponseEntity.ok(productInterestService.updateInterestRate(productCode, rateCode, interestDto));
     }
 
-    @DeleteMapping("/{rateId}")
+    @DeleteMapping("/{rateCode}")
     @Operation(summary = "Delete an interest rate")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Interest rate deleted successfully"),
@@ -87,8 +87,8 @@ public class ProductInterestController {
     })
     public ResponseEntity<Void> deleteInterestRate(
             @PathVariable String productCode,
-            @PathVariable UUID rateId) {
-        productInterestService.deleteInterestRate(productCode, rateId);
+            @PathVariable String rateCode) {
+        productInterestService.deleteInterestRate(productCode, rateCode);
         return ResponseEntity.noContent().build();
     }
 }

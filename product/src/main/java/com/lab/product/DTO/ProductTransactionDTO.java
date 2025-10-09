@@ -9,6 +9,7 @@ import java.util.UUID;
 @Data
 public class ProductTransactionDTO {
     private UUID transactionId;
+    private String transactionCode;
     private PRODUCT_TRANSACTION_TYPE transactionType;
     private BigDecimal amountLimit;
 }

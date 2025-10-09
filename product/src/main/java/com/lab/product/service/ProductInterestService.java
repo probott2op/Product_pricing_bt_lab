@@ -5,8 +5,6 @@ import com.lab.product.DTO.ProductInterestRequestDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.UUID;
-
 public interface ProductInterestService {
     /**
      * Add a new interest rate to a product
@@ -19,17 +17,17 @@ public interface ProductInterestService {
     Page<ProductInterestDTO> getInterestRatesForProduct(String productCode, Pageable pageable);
     
     /**
-     * Get a specific interest rate by ID
+     * Get a specific interest rate by code
      */
-    ProductInterestDTO getInterestRateById(String productCode, UUID rateId);
+    ProductInterestDTO getInterestRateByCode(String productCode, String rateCode);
     
     /**
      * Update an interest rate
      */
-    ProductInterestDTO updateInterestRate(String productCode, UUID rateId, ProductInterestRequestDTO interestDto);
+    ProductInterestDTO updateInterestRate(String productCode, String rateCode, ProductInterestRequestDTO interestDto);
     
     /**
      * Delete an interest rate
      */
-    void deleteInterestRate(String productCode, UUID rateId);
+    void deleteInterestRate(String productCode, String rateCode);
 }
