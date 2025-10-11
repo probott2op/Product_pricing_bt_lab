@@ -19,7 +19,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/products/{productCode}/rules")
 @RequiredArgsConstructor
-@Tag(name = "Product Rules", description = "Product rules management endpoints")
+@Tag(
+    name = "Product Business Rules",
+    description = "This API is the definitive source for managing all business rules that govern a financial product."+
+            " It allows you to configure these rules as key attributes, including balance limits (min/max),"+
+            " conditional interest rate bonuses (e.g., for 'Gold members' or 'under 18'), and the primary interest"+
+            " calculation method (simple vs. compound with its frequency). It's the central hub for a product's entire"+
+            " configurable DNA and operational logic."
+)
 public class ProductRuleController {
 
     @Autowired

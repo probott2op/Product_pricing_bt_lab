@@ -20,7 +20,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/products/{productCode}/transactions")
 @RequiredArgsConstructor
-@Tag(name = "Product Transactions", description = "Product transactions management endpoints")
+@Tag(
+    name = "Product Transaction Types",
+    description = "API for managing allowed transaction types and transaction configuration for products. " +
+                  "Transaction configurations define which operations are permitted on a product (DEPOSIT, WITHDRAWAL, " +
+                  "TRANSFER, PAYMENT, etc.), transaction limits, processing rules, and channel availability " +
+                  "(ATM, ONLINE, BRANCH, MOBILE). Each transaction type includes minimum/maximum amount limits, " +
+                  "daily limits, and frequency restrictions. Essential for channel management, fraud prevention, " +
+                  "and customer service optimization."
+)
 public class ProductTransactionController {
 
     @Autowired

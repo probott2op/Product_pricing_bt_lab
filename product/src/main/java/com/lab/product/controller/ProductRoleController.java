@@ -20,7 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/products/{productCode}/roles")
 @RequiredArgsConstructor
-@Tag(name = "Product Roles", description = "Product roles management endpoints")
+@Tag(
+    name = "Product Roles & Permissions",
+    description = "An API for managing which user roles can access a specific financial product."+
+            " It establishes a simple mapping between a product and one or more roles (e.g., 'OWNER', 'CO_OWNER',"+
+            " 'GUARDIAN'), effectively creating an access list. This controls product visibility and"+
+            " eligibility at a high level."
+)
 public class ProductRoleController {
 
     @Autowired

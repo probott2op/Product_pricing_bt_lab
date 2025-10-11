@@ -20,7 +20,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/products/{productCode}/communications")
 @RequiredArgsConstructor
-@Tag(name = "Product Communications", description = "Product communications management endpoints")
+@Tag(
+    name = "Product Communication Templates",
+    description = "API for managing customer communication templates and notification configurations for products. " +
+                  "Communication templates define automated messages sent to customers for various events " +
+                  "(ACCOUNT_OPENING, TRANSACTION_ALERT, STATEMENT_GENERATION, PAYMENT_DUE, etc.). " +
+                  "Supports multiple communication channels (EMAIL, SMS, PUSH_NOTIFICATION, IN_APP, POSTAL_MAIL) " +
+                  "and communication types (TRANSACTIONAL, PROMOTIONAL, REGULATORY, STATEMENT). " +
+                  "Critical for customer engagement, compliance notifications, and regulatory reporting."
+)
 public class ProductCommunicationController {
 
     @Autowired

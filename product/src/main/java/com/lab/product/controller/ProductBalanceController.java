@@ -20,7 +20,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/products/{productCode}/balances")
 @RequiredArgsConstructor
-@Tag(name = "Product Balances", description = "Product balances management endpoints")
+@Tag(
+    name = "Product Balance Configuration",
+    description = "An API for defining the structural balance components available for a financial product."+
+            " It specifies the distinct types of balances that an account can hold, such as PRINCIPAL,OVERDRAFT, INTEREST_ACCRUED, or FEES."+
+            " This API establishes the product's ledger schema, rather than managing specific rules like minimum balance requirements"+
+            " or overdraft limits."
+)
 public class ProductBalanceController {
 
     @Autowired

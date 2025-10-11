@@ -20,7 +20,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/products/{productCode}/charges")
 @RequiredArgsConstructor
-@Tag(name = "Product Charges", description = "Product charges management endpoints")
+@Tag(
+    name = "Product Charges & Fees",
+    description = "Comprehensive API for managing product charges, fees, and pricing structures. " +
+                  "Charges include account maintenance fees, transaction fees, processing charges, penalty fees, " +
+                  "and service charges. Supports various charge types (FIXED, PERCENTAGE), calculation methods, " +
+                  "frequency configurations (ONE_TIME, MONTHLY, QUARTERLY, ANNUALLY), and debit/credit indicators. " +
+                  "Essential for revenue generation and transparent customer pricing."
+)
 public class ProductChargeController {
 
     @Autowired
