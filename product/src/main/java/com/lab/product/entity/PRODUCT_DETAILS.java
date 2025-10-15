@@ -1,6 +1,8 @@
 package com.lab.product.entity;
 
 
+import com.lab.product.entity.ENUMS.COMPOUNDING_FREQUENCY;
+import com.lab.product.entity.ENUMS.INTEREST_TYPE;
 import com.lab.product.entity.ENUMS.PRODUCT_CURRENCY;
 import com.lab.product.entity.ENUMS.PRODUCT_STATUS;
 import com.lab.product.entity.ENUMS.PRODUCT_TYPE;
@@ -42,6 +44,14 @@ public class PRODUCT_DETAILS extends AuditLoggable {
     @Enumerated(EnumType.STRING)
     @Column(name="PRODUCT_STATUS")
     private PRODUCT_STATUS status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "INTEREST_TYPE")
+    private INTEREST_TYPE interestType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "COMPOUNDING_FREQUENCY")
+    private COMPOUNDING_FREQUENCY compoundingFrequency;
 
     // Relationships
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

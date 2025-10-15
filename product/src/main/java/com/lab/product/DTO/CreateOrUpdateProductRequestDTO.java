@@ -1,5 +1,7 @@
 package com.lab.product.DTO;
 
+import com.lab.product.entity.ENUMS.COMPOUNDING_FREQUENCY;
+import com.lab.product.entity.ENUMS.INTEREST_TYPE;
 import com.lab.product.entity.ENUMS.PRODUCT_CURRENCY;
 import com.lab.product.entity.ENUMS.PRODUCT_STATUS;
 import com.lab.product.entity.ENUMS.PRODUCT_TYPE;
@@ -32,6 +34,10 @@ public class CreateOrUpdateProductRequestDTO {
     
     private Date expr_date;
 
+    private String interestType;
+    
+    private String compoundingFrequency;
+
     // Custom validation method for business rules
     public void validate() {
         // Validate enum values
@@ -44,6 +50,12 @@ public class CreateOrUpdateProductRequestDTO {
             }
             if (status != null) {
                 PRODUCT_STATUS.valueOf(status);
+            }
+            if (interestType != null) {
+                INTEREST_TYPE.valueOf(interestType);
+            }
+            if (compoundingFrequency != null) {
+                COMPOUNDING_FREQUENCY.valueOf(compoundingFrequency);
             }
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid enum value: " + e.getMessage());

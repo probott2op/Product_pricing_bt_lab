@@ -3,6 +3,8 @@ package com.lab.product.service.impl;
 import com.lab.product.DTO.CreateOrUpdateProductRequestDTO;
 import com.lab.product.DTO.ProductDetailsDTO;
 import com.lab.product.entity.PRODUCT_DETAILS;
+import com.lab.product.entity.ENUMS.COMPOUNDING_FREQUENCY;
+import com.lab.product.entity.ENUMS.INTEREST_TYPE;
 import com.lab.product.entity.ENUMS.PRODUCT_TYPE;
 import com.lab.product.entity.ENUMS.PRODUCT_STATUS;
 import com.lab.product.entity.ENUMS.PRODUCT_CURRENCY;
@@ -50,6 +52,12 @@ public class ProductServiceImpl implements ProductService {
             if (requestDTO.getCurrency() != null) {
                 entity.setCurrency(PRODUCT_CURRENCY.valueOf(requestDTO.getCurrency()));
             }
+            if (requestDTO.getInterestType() != null) {
+                entity.setInterestType(INTEREST_TYPE.valueOf(requestDTO.getInterestType()));
+            }
+            if (requestDTO.getCompoundingFrequency() != null) {
+                entity.setCompoundingFrequency(COMPOUNDING_FREQUENCY.valueOf(requestDTO.getCompoundingFrequency()));
+            }
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Invalid enum value: " + e.getMessage());
         }
@@ -96,6 +104,12 @@ public class ProductServiceImpl implements ProductService {
             }
             if (requestDTO.getStatus() != null) {
                 existing.setStatus(PRODUCT_STATUS.valueOf(requestDTO.getStatus()));
+            }
+            if (requestDTO.getInterestType() != null) {
+                existing.setInterestType(INTEREST_TYPE.valueOf(requestDTO.getInterestType()));
+            }
+            if (requestDTO.getCompoundingFrequency() != null) {
+                existing.setCompoundingFrequency(COMPOUNDING_FREQUENCY.valueOf(requestDTO.getCompoundingFrequency()));
             }
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Invalid enum value: " + e.getMessage());

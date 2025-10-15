@@ -128,6 +128,8 @@ public class ProductMapper {
         dto.setProductType(product.getProductType());
         dto.setCurrency(product.getCurrency());
         dto.setStatus(product.getStatus());
+        dto.setInterestType(product.getInterestType());
+        dto.setCompoundingFrequency(product.getCompoundingFrequency());
         // rules
         if (product.getProductRules() != null) {
             dto.setProductRules(product.getProductRules().stream().map(r -> {

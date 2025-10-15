@@ -1,5 +1,7 @@
 package com.lab.product.DTO;
 
+import com.lab.product.entity.ENUMS.COMPOUNDING_FREQUENCY;
+import com.lab.product.entity.ENUMS.INTEREST_TYPE;
 import com.lab.product.entity.ENUMS.PRODUCT_CURRENCY;
 import com.lab.product.entity.ENUMS.PRODUCT_STATUS;
 import com.lab.product.entity.ENUMS.PRODUCT_TYPE;
@@ -18,6 +20,8 @@ public class ProductDetailsDTO {
     private PRODUCT_TYPE productType;
     private PRODUCT_CURRENCY currency;
     private PRODUCT_STATUS status;
+    private INTEREST_TYPE interestType;
+    private COMPOUNDING_FREQUENCY compoundingFrequency;
     private List<ProductRuleDTO> productRules;
     private List<ProductChargeDTO> productCharges;
     private List<ProductRoleDTO> productRoles;
