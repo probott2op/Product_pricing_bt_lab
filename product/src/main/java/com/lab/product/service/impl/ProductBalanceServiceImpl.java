@@ -4,6 +4,7 @@ import com.lab.product.DTO.ProductBalanceDTO;
 import com.lab.product.DTO.ProductBalanceRequestDTO;
 import com.lab.product.entity.PRODUCT_BALANCE;
 import com.lab.product.entity.PRODUCT_DETAILS;
+import com.lab.product.entity.ENUMS.PRODUCT_BALANCE_TYPE;
 import com.lab.product.Exception.ResourceNotFoundException;
 import com.lab.product.DAO.ProductBalanceRepository;
 import com.lab.product.DAO.ProductDetailsRepository;
@@ -29,10 +30,16 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
+        // Check if balance type already exists for this product
+        if (balanceRepository.existsByProductAndBalanceType(product, balanceDto.getBalanceType())) {
+            throw new IllegalArgumentException("Balance type '" + balanceDto.getBalanceType() + 
+                "' already exists for product: " + productCode);
+        }
+
         PRODUCT_BALANCE balance = new PRODUCT_BALANCE();
         balance.setProduct(product);
         balance.setBalanceType(balanceDto.getBalanceType());
-        balance.setBalanceCode(balanceDto.getBalanceCode());
+        balance.setIsActive(balanceDto.getIsActive() != null ? balanceDto.getIsActive() : true);
         
         // Fill audit fields
         mapper.fillAuditFields(balance);
@@ -51,27 +58,29 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
     }
 
     @Override
-    public ProductBalanceDTO getBalanceByCode(String productCode, String balanceCode) {
+    public ProductBalanceDTO getBalanceByType(String productCode, String balanceType) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceCode(product, balanceCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceCode));
+        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceType(product, 
+            PRODUCT_BALANCE_TYPE.valueOf(balanceType))
+            .orElseThrow(() -> new ResourceNotFoundException("Balance type not found: " + balanceType));
             
         return mapper.toBalanceDto(balance);
     }
 
     @Override
     @Transactional
-    public ProductBalanceDTO updateBalance(String productCode, String balanceCode, ProductBalanceRequestDTO balanceDto) {
+    public ProductBalanceDTO updateBalance(String productCode, String balanceType, ProductBalanceRequestDTO balanceDto) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceCode(product, balanceCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceCode));
+        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceType(product, 
+            PRODUCT_BALANCE_TYPE.valueOf(balanceType))
+            .orElseThrow(() -> new ResourceNotFoundException("Balance type not found: " + balanceType));
 
         balance.setBalanceType(balanceDto.getBalanceType());
-        balance.setBalanceCode(balanceDto.getBalanceCode());
+        balance.setIsActive(balanceDto.getIsActive() != null ? balanceDto.getIsActive() : balance.getIsActive());
         
         // Update audit fields
         mapper.fillAuditFields(balance);
@@ -82,12 +91,13 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
 
     @Override
     @Transactional
-    public void deleteBalance(String productCode, String balanceCode) {
+    public void deleteBalance(String productCode, String balanceType) {
         PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
-        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceCode(product, balanceCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Balance not found: " + balanceCode));
+        PRODUCT_BALANCE balance = balanceRepository.findByProductAndBalanceType(product, 
+            PRODUCT_BALANCE_TYPE.valueOf(balanceType))
+            .orElseThrow(() -> new ResourceNotFoundException("Balance type not found: " + balanceType));
 
         balanceRepository.delete(balance);
     }

@@ -20,6 +20,8 @@ public class ProductMapper {
         ProductBalanceDTO dto = new ProductBalanceDTO();
         dto.setBalanceId(balance.getBalanceId());
         dto.setBalanceType(balance.getBalanceType());
+        dto.setIsActive(balance.getIsActive());
+        dto.setCreatedAt(balance.getCreatedAt());
         return dto;
     }
     
@@ -179,15 +181,11 @@ public class ProductMapper {
             }).collect(Collectors.toList()));
         }
 
-        // balances
+        // balances - ledger schema components
         if (product.getProductBalances() != null) {
-            dto.setProductBalances(product.getProductBalances().stream().map(b -> {
-                ProductBalanceDTO pb = new ProductBalanceDTO();
-                pb.setBalanceId(b.getBalanceId());
-                pb.setBalanceType(b.getBalanceType());
-                pb.setAmount(null);
-                return pb;
-            }).collect(Collectors.toList()));
+            dto.setProductBalances(product.getProductBalances().stream()
+                .map(this::toBalanceDto)
+                .collect(Collectors.toList()));
         }
 
         // communications
