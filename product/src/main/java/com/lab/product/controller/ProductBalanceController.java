@@ -112,6 +112,32 @@ public class ProductBalanceController {
                 schema = @Schema(implementation = ProductBalanceDTO.class),
                 examples = {
                     @ExampleObject(
+                        name = "FD001 Principal Added",
+                        summary = "Added FD_PRINCIPAL to FD001 product",
+                        value = """
+                            {
+                              "balanceId": "4deff13c-a7de-4a01-b116-fae6f9ea6e17",
+                              "balanceCode": "FD_PRINCIPAL",
+                              "balanceType": "FD_PRINCIPAL",
+                              "isActive": true,
+                              "createdAt": "2025-10-15T10:30:00"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "FD001 Interest Added",
+                        summary = "Added FD_INTEREST to FD001 product",
+                        value = """
+                            {
+                              "balanceId": "4b0da79d-87d4-454a-bcdf-c0c9b06c0c16",
+                              "balanceCode": "FD_INTEREST",
+                              "balanceType": "FD_INTEREST",
+                              "isActive": true,
+                              "createdAt": "2025-10-15T10:31:00"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
                         name = "Loan Principal Added",
                         summary = "Added LOAN_PRINCIPAL to loan product",
                         value = """
@@ -120,18 +146,6 @@ public class ProductBalanceController {
                               "balanceType": "LOAN_PRINCIPAL",
                               "isActive": true,
                               "createdAt": "2025-10-15T10:30:00"
-                            }
-                            """
-                    ),
-                    @ExampleObject(
-                        name = "FD Interest Added",
-                        summary = "Added FD_INTEREST to FD product",
-                        value = """
-                            {
-                              "balanceId": "882e8400-e29b-41d4-a716-446655440002",
-                              "balanceType": "FD_INTEREST",
-                              "isActive": true,
-                              "createdAt": "2025-10-15T10:31:00"
                             }
                             """
                     )
@@ -261,6 +275,38 @@ public class ProductBalanceController {
                 schema = @Schema(implementation = Page.class),
                 examples = {
                     @ExampleObject(
+                        name = "FD001 Balance Types",
+                        summary = "Fixed Deposit under 500000 - Principal, Interest, and Penalty balances",
+                        value = """
+                            {
+                              "content": [
+                                {
+                                  "balanceId": "88b934e7-9688-49c1-9c59-0fbff87be971",
+                                  "balanceType": "FD_PRINCIPAL",
+                                  "isActive": true,
+                                  "createdAt": "2025-10-19T18:45:23.47411"
+                                },
+                                {
+                                  "balanceId": "1360a975-0102-40d1-87d9-047c927dc794",
+                                  "balanceType": "FD_INTEREST",
+                                  "isActive": true,
+                                  "createdAt": "2025-10-19T18:44:59.9126"
+                                },
+                                {
+                                  "balanceId": "bbb417ac-fd89-4243-a995-47746d0980b7",
+                                  "balanceType": "PENALTY",
+                                  "isActive": true,
+                                  "createdAt": "2025-10-19T18:45:40.10681"
+                                }
+                              ],
+                              "totalElements": 3,
+                              "totalPages": 1,
+                              "number": 0,
+                              "size": 20
+                            }
+                            """
+                    ),
+                    @ExampleObject(
                         name = "Loan Product Balances",
                         summary = "3 balance types for personal loan",
                         value = """
@@ -293,20 +339,20 @@ public class ProductBalanceController {
                             """
                     ),
                     @ExampleObject(
-                        name = "FD Product Balances",
-                        summary = "2 balance types for fixed deposit",
+                        name = "Savings Product Balances",
+                        summary = "2 balance types for savings account",
                         value = """
                             {
                               "content": [
                                 {
                                   "balanceId": "884e8400-e29b-41d4-a716-446655440004",
-                                  "balanceType": "FD_PRINCIPAL",
+                                  "balanceType": "AVAILABLE_BALANCE",
                                   "isActive": true,
                                   "createdAt": "2025-01-01T00:00:00"
                                 },
                                 {
                                   "balanceId": "885e8400-e29b-41d4-a716-446655440005",
-                                  "balanceType": "FD_INTEREST",
+                                  "balanceType": "LEDGER_BALANCE",
                                   "isActive": true,
                                   "createdAt": "2025-01-01T00:00:00"
                                 }

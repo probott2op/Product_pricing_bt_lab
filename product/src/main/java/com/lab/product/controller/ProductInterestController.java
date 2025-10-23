@@ -59,8 +59,8 @@ public class ProductInterestController {
             **Use Cases:**
             
             **Scenario 1: Tiered Savings Interest**
-            - Tier 1: $0 - $10,000 at 3.0% APY
-            - Tier 2: $10,001 - $50,000 at 3.5% APY
+            - Tier 1: ₹0 - ₹10,00,000 at 3.0% APY
+            - Tier 2: $10,001 - ₹50,00,000 at 3.5% APY
             - Tier 3: $50,001+ at 4.0% APY
             - Higher balances earn better rates
             
@@ -71,14 +71,14 @@ public class ProductInterestController {
             - Longer tenure earns higher rates
             
             **Scenario 3: Loan Amount Tiers**
-            - $0 - $25,000 at 8.5% APR
+            - ₹0 - ₹25,00,000 at 8.5% APR
             - $25,001 - $100,000 at 7.5% APR
-            - $100,001+ at 6.5% APR
+            - ₹1,00,00,100+ at 6.5% APR
             - Larger loans get better rates
             
             **Scenario 4: Promotional Rate Tier**
-            - Special introductory rate for first $5,000
-            - 5.0% for balances $0 - $5,000
+            - Special introductory rate for first ₹5,00,000
+            - 5.0% for balances ₹0 - ₹5,00,000
             - Then regular tiers apply
             
             **Tier Design Best Practices:**
@@ -105,8 +105,38 @@ public class ProductInterestController {
                 schema = @Schema(implementation = ProductInterestDTO.class),
                 examples = {
                     @ExampleObject(
-                        name = "Savings Tier 1 Created",
-                        summary = "Base tier for balances $0-$10,000",
+                        name = "FD001 12-Month Rate Created",
+                        summary = "Fixed Deposit 12-month tenure rate - 7.6%",
+                        value = """
+                            {
+                              "interestId": "0f2d02a8-c93b-4ae4-95b1-f38713891300",
+                              "interestCode": "FD001_12M",
+                              "term": "12M",
+                              "interestRate": 7.6,
+                              "compoundingType": "CUMULATIVE",
+                              "createdAt": "2025-10-15T10:30:00",
+                              "updatedAt": "2025-10-15T10:30:00"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "FD001 24-Month Rate Created",
+                        summary = "Fixed Deposit 24-month tenure rate - 7.7%",
+                        value = """
+                            {
+                              "interestId": "f0c0fc28-5e0e-4e2a-bf37-c0dd0f0c25c2",
+                              "interestCode": "FD001_24M",
+                              "term": "24M",
+                              "interestRate": 7.7,
+                              "compoundingType": "CUMULATIVE",
+                              "createdAt": "2025-10-15T10:31:00",
+                              "updatedAt": "2025-10-15T10:31:00"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "Savings Tier Created",
+                        summary = "Savings account base tier",
                         value = """
                             {
                               "interestId": "661e8400-e29b-41d4-a716-446655440001",
@@ -117,22 +147,6 @@ public class ProductInterestController {
                               "isActive": true,
                               "createdAt": "2025-10-15T10:30:00",
                               "updatedAt": "2025-10-15T10:30:00"
-                            }
-                            """
-                    ),
-                    @ExampleObject(
-                        name = "FD Tenure Rate Created",
-                        summary = "1-year fixed deposit rate",
-                        value = """
-                            {
-                              "interestId": "662e8400-e29b-41d4-a716-446655440002",
-                              "tierName": "1 Year Tenure",
-                              "minBalance": 1000.00,
-                              "maxBalance": 999999999.99,
-                              "interestRate": 6.50,
-                              "isActive": true,
-                              "createdAt": "2025-10-15T10:31:00",
-                              "updatedAt": "2025-10-15T10:31:00"
                             }
                             """
                     )
@@ -170,7 +184,7 @@ public class ProductInterestController {
                         value = """
                             {
                               "error": "Conflict",
-                              "message": "Balance range $5,000 - $15,000 overlaps with existing tier 'Tier 1' ($0 - $10,000)",
+                              "message": "Balance range ₹5,00,000 - ₹15,00,000 overlaps with existing tier 'Tier 1' (₹0 - ₹10,00,000)",
                               "timestamp": "2025-10-15T10:30:00"
                             }
                             """
@@ -290,56 +304,117 @@ public class ProductInterestController {
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = Page.class),
-                examples = @ExampleObject(
-                    name = "Tiered Savings Rates",
-                    summary = "3-tier savings rate structure",
-                    value = """
-                        {
-                          "content": [
+                examples = {
+                    @ExampleObject(
+                        name = "FD001 Interest Rates",
+                        summary = "Fixed Deposit under 500000 - Multiple tenure interest rates",
+                        value = """
                             {
-                              "interestId": "661e8400-e29b-41d4-a716-446655440001",
-                              "tierName": "Tier 1 - Base",
-                              "minBalance": 0.00,
-                              "maxBalance": 10000.00,
-                              "interestRate": 3.50,
-                              "isActive": true,
-                              "createdAt": "2025-01-01T00:00:00"
-                            },
-                            {
-                              "interestId": "662e8400-e29b-41d4-a716-446655440002",
-                              "tierName": "Tier 2 - Silver",
-                              "minBalance": 10000.01,
-                              "maxBalance": 50000.00,
-                              "interestRate": 4.00,
-                              "isActive": true,
-                              "createdAt": "2025-01-01T00:00:00"
-                            },
-                            {
-                              "interestId": "663e8400-e29b-41d4-a716-446655440003",
-                              "tierName": "Tier 3 - Gold",
-                              "minBalance": 50000.01,
-                              "maxBalance": 999999999.99,
-                              "interestRate": 4.50,
-                              "isActive": true,
-                              "createdAt": "2025-01-01T00:00:00"
+                              "content": [
+                                {
+                                  "rateId": "e75bed67-db57-405d-9f35-0af9d0d62e70",
+                                  "rateCode": "INT12M001",
+                                  "termInMonths": 12,
+                                  "rateCumulative": 7.6,
+                                  "rateNonCumulativeMonthly": 7.4,
+                                  "rateNonCumulativeQuarterly": 7.5,
+                                  "rateNonCumulativeYearly": 7.6
+                                },
+                                {
+                                  "rateId": "953cb07f-40e3-477e-93c4-21aab0a9d387",
+                                  "rateCode": "INT24M001",
+                                  "termInMonths": 24,
+                                  "rateCumulative": 7.7,
+                                  "rateNonCumulativeMonthly": 7.5,
+                                  "rateNonCumulativeQuarterly": 7.6,
+                                  "rateNonCumulativeYearly": 7.7
+                                },
+                                {
+                                  "rateId": "6c433990-8040-47e9-ba5e-d609b2e273d6",
+                                  "rateCode": "INT36M001",
+                                  "termInMonths": 36,
+                                  "rateCumulative": 8,
+                                  "rateNonCumulativeMonthly": 7.85,
+                                  "rateNonCumulativeQuarterly": 7.9,
+                                  "rateNonCumulativeYearly": 7.8
+                                },
+                                {
+                                  "rateId": "fd3feafa-b19b-4540-b42d-c0fa1efdadd6",
+                                  "rateCode": "INT60M001",
+                                  "termInMonths": 60,
+                                  "rateCumulative": 8.5,
+                                  "rateNonCumulativeMonthly": 8.3,
+                                  "rateNonCumulativeQuarterly": 8.4,
+                                  "rateNonCumulativeYearly": 8.5
+                                }
+                              ],
+                              "pageable": {
+                                "pageNumber": 0,
+                                "pageSize": 20,
+                                "sort": {
+                                  "sorted": true,
+                                  "unsorted": false
+                                }
+                              },
+                              "totalElements": 4,
+                              "totalPages": 1,
+                              "last": true,
+                              "first": true,
+                              "empty": false
                             }
-                          ],
-                          "pageable": {
-                            "pageNumber": 0,
-                            "pageSize": 20,
-                            "sort": {
-                              "sorted": true,
-                              "unsorted": false
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "Tiered Savings Rates",
+                        summary = "3-tier savings rate structure",
+                        value = """
+                            {
+                              "content": [
+                                {
+                                  "interestId": "661e8400-e29b-41d4-a716-446655440001",
+                                  "tierName": "Tier 1 - Base",
+                                  "minBalance": 0.00,
+                                  "maxBalance": 10000.00,
+                                  "interestRate": 3.50,
+                                  "isActive": true,
+                                  "createdAt": "2025-01-01T00:00:00"
+                                },
+                                {
+                                  "interestId": "662e8400-e29b-41d4-a716-446655440002",
+                                  "tierName": "Tier 2 - Silver",
+                                  "minBalance": 10000.01,
+                                  "maxBalance": 50000.00,
+                                  "interestRate": 4.00,
+                                  "isActive": true,
+                                  "createdAt": "2025-01-01T00:00:00"
+                                },
+                                {
+                                  "interestId": "663e8400-e29b-41d4-a716-446655440003",
+                                  "tierName": "Tier 3 - Gold",
+                                  "minBalance": 50000.01,
+                                  "maxBalance": 999999999.99,
+                                  "interestRate": 4.50,
+                                  "isActive": true,
+                                  "createdAt": "2025-01-01T00:00:00"
+                                }
+                              ],
+                              "pageable": {
+                                "pageNumber": 0,
+                                "pageSize": 20,
+                                "sort": {
+                                  "sorted": true,
+                                  "unsorted": false
+                                }
+                              },
+                              "totalElements": 3,
+                              "totalPages": 1,
+                              "last": true,
+                              "first": true,
+                              "empty": false
                             }
-                          },
-                          "totalElements": 3,
-                          "totalPages": 1,
-                          "last": true,
-                          "first": true,
-                          "empty": false
-                        }
-                        """
-                )
+                            """
+                    )
+                }
             )
         ),
         @ApiResponse(
@@ -593,7 +668,7 @@ public class ProductInterestController {
                         value = """
                             {
                               "error": "Conflict",
-                              "message": "Updated balance range $8,000 - $25,000 overlaps with Tier 2 ($10,000 - $50,000)",
+                              "message": "Updated balance range ₹8,00,000 - ₹25,00,000 overlaps with Tier 2 (₹10,00,000 - ₹50,00,000)",
                               "timestamp": "2025-10-15T10:30:00"
                             }
                             """

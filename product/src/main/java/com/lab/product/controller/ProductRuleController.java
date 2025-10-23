@@ -78,9 +78,9 @@ public class ProductRuleController {
             **Use Cases:**
             
             **Scenario 1: Minimum Balance Rule**
-            - Rule: Minimum balance must be $100
+            - Rule: Minimum balance must be ₹10,000
             - Type: VALIDATION
-            - Action: Reject if balance < $100
+            - Action: Reject if balance < ₹10,000
             - Penalty: $5 fee if falls below
             
             **Scenario 2: Age Restriction Rule**
@@ -90,7 +90,7 @@ public class ProductRuleController {
             - Exception: Joint account with parent
             
             **Scenario 3: Daily Withdrawal Limit**
-            - Rule: Maximum $1,000 withdrawal per day
+            - Rule: Maximum ₹1,00,000 withdrawal per day
             - Type: TRANSACTION_LIMIT
             - Action: Decline if exceeds limit
             - Reset: Daily at midnight
@@ -126,23 +126,41 @@ public class ProductRuleController {
                 schema = @Schema(implementation = ProductRuleDTO.class),
                 examples = {
                     @ExampleObject(
-                        name = "Minimum Balance Rule",
-                        summary = "Minimum $100 balance required",
+                        name = "FD001 Minimum Amount Rule",
+                        summary = "FD minimum 10,000 INR requirement",
                         value = """
                             {
-                              "ruleId": "991e8400-e29b-41d4-a716-446655440001",
-                              "ruleName": "Minimum Balance Requirement",
-                              "ruleType": "VALIDATION",
-                              "ruleExpression": "balance >= 100",
-                              "rulePriority": 1,
-                              "errorMessage": "Account balance must be at least $100",
+                              "ruleId": "a9e3f3f3-a120-41a3-8e5e-b2c1f0b5e080",
+                              "ruleCode": "MIN001",
+                              "ruleName": "Minimum for FD001",
+                              "ruleType": "SIMPLE",
+                              "dataType": "NUMBER",
+                              "ruleValue": "10000",
+                              "validationType": "MIN_MAX",
                               "isActive": true,
                               "createdAt": "2025-10-15T10:30:00"
                             }
                             """
                     ),
                     @ExampleObject(
-                        name = "Age Eligibility Rule",
+                        name = "FD001 Maximum Amount Rule",
+                        summary = "FD maximum 500,000 INR limit",
+                        value = """
+                            {
+                              "ruleId": "37fe7f8a-d9ea-4661-8ac9-dc3dc3ea5dcd",
+                              "ruleCode": "MAX001",
+                              "ruleName": "Maximum for FD001",
+                              "ruleType": "SIMPLE",
+                              "dataType": "NUMBER",
+                              "ruleValue": "500000",
+                              "validationType": "MIN_MAX",
+                              "isActive": true,
+                              "createdAt": "2025-10-15T10:31:00"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "Savings Age Rule",
                         summary = "Must be 18 years or older",
                         value = """
                             {
@@ -154,22 +172,6 @@ public class ProductRuleController {
                               "errorMessage": "Account holder must be 18 years or older",
                               "isActive": true,
                               "createdAt": "2025-10-15T10:31:00"
-                            }
-                            """
-                    ),
-                    @ExampleObject(
-                        name = "Daily Withdrawal Limit",
-                        summary = "Maximum $1,000 per day",
-                        value = """
-                            {
-                              "ruleId": "993e8400-e29b-41d4-a716-446655440003",
-                              "ruleName": "Daily ATM Withdrawal Limit",
-                              "ruleType": "TRANSACTION_LIMIT",
-                              "ruleExpression": "daily_withdrawal_total <= 1000",
-                              "rulePriority": 2,
-                              "errorMessage": "Daily withdrawal limit of $1,000 exceeded",
-                              "isActive": true,
-                              "createdAt": "2025-10-15T10:32:00"
                             }
                             """
                     )
@@ -329,6 +331,110 @@ public class ProductRuleController {
                 schema = @Schema(implementation = Page.class),
                 examples = {
                     @ExampleObject(
+                        name = "FD001 Business Rules",
+                        summary = "Fixed Deposit under 500000 - Comprehensive rule set",
+                        value = """
+                            {
+                              "content": [
+                                {
+                                  "ruleId": "a9e3f3f3-a120-41a3-8e5e-b2c1f0b5e080",
+                                  "ruleCode": "MIN001",
+                                  "ruleName": "Minimum for FD001",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "NUMBER",
+                                  "ruleValue": "10000",
+                                  "validationType": "MIN_MAX"
+                                },
+                                {
+                                  "ruleId": "37fe7f8a-d9ea-4661-8ac9-dc3dc3ea5dcd",
+                                  "ruleCode": "MAX001",
+                                  "ruleName": "Maximum for FD001",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "NUMBER",
+                                  "ruleValue": "500000",
+                                  "validationType": "MIN_MAX"
+                                },
+                                {
+                                  "ruleId": "1baae6cf-106a-444d-b7a7-85b889f329d8",
+                                  "ruleCode": "JR001",
+                                  "ruleName": "Extra Interest for under 18",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "PERCENTAGE",
+                                  "ruleValue": "0.5",
+                                  "validationType": "EXACT"
+                                },
+                                {
+                                  "ruleId": "c478c7af-9d64-41a6-b2e2-45552054c85d",
+                                  "ruleCode": "SR001",
+                                  "ruleName": "Extra Interest for sr",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "PERCENTAGE",
+                                  "ruleValue": "0.75",
+                                  "validationType": "EXACT"
+                                },
+                                {
+                                  "ruleId": "fb409ac1-149f-4163-8e88-835da99bb8bc",
+                                  "ruleCode": "DY001",
+                                  "ruleName": "Extra Interest for Digi Youth",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "PERCENTAGE",
+                                  "ruleValue": "0.25",
+                                  "validationType": "EXACT"
+                                },
+                                {
+                                  "ruleId": "6c4879fc-9650-4762-bdff-28c3fbf8177f",
+                                  "ruleCode": "SIL001",
+                                  "ruleName": "Silver members extra interest",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "NUMBER",
+                                  "ruleValue": "0.5",
+                                  "validationType": "EXACT"
+                                },
+                                {
+                                  "ruleId": "473f6407-6378-412e-8ef4-b579e362d83a",
+                                  "ruleCode": "GOLD001",
+                                  "ruleName": "Gold members extra interest",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "NUMBER",
+                                  "ruleValue": "1",
+                                  "validationType": "EXACT"
+                                },
+                                {
+                                  "ruleId": "fe956b24-a359-4c26-bafd-05855e669851",
+                                  "ruleCode": "PLAT001",
+                                  "ruleName": "Platinum members extra interest",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "NUMBER",
+                                  "ruleValue": "1.5",
+                                  "validationType": "EXACT"
+                                },
+                                {
+                                  "ruleId": "d77a6842-2296-40cc-af4b-81b72c770e61",
+                                  "ruleCode": "EMP001",
+                                  "ruleName": "Employee members extra interest",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "NUMBER",
+                                  "ruleValue": "1.5",
+                                  "validationType": "EXACT"
+                                },
+                                {
+                                  "ruleId": "363ffabc-0827-46d3-bcd1-adae3f42ffe3",
+                                  "ruleCode": "MAXINT001",
+                                  "ruleName": "Maximum excess interest",
+                                  "ruleType": "SIMPLE",
+                                  "dataType": "PERCENTAGE",
+                                  "ruleValue": "2",
+                                  "validationType": "MIN_MAX"
+                                }
+                              ],
+                              "totalElements": 10,
+                              "totalPages": 1,
+                              "number": 0,
+                              "size": 20
+                            }
+                            """
+                    ),
+                    @ExampleObject(
                         name = "Savings Account Rules",
                         summary = "3 business rules for savings product",
                         value = """
@@ -349,7 +455,7 @@ public class ProductRuleController {
                                   "ruleType": "VALIDATION",
                                   "ruleExpression": "opening_balance >= 100",
                                   "rulePriority": 2,
-                                  "errorMessage": "Minimum opening balance: $100",
+                                  "errorMessage": "Minimum opening balance: ₹10,000",
                                   "isActive": true
                                 },
                                 {
@@ -358,7 +464,7 @@ public class ProductRuleController {
                                   "ruleType": "TRANSACTION_LIMIT",
                                   "ruleExpression": "daily_withdrawals <= 1000",
                                   "rulePriority": 3,
-                                  "errorMessage": "Daily limit: $1,000",
+                                  "errorMessage": "Daily limit: ₹1,00,000",
                                   "isActive": true
                                 }
                               ],
@@ -515,7 +621,7 @@ public class ProductRuleController {
                               "ruleType": "VALIDATION",
                               "ruleExpression": "balance >= 100",
                               "rulePriority": 2,
-                              "errorMessage": "Account balance must be at least $100",
+                              "errorMessage": "Account balance must be at least ₹10,000",
                               "isActive": true,
                               "createdAt": "2025-01-01T00:00:00",
                               "updatedAt": "2025-03-15T14:20:00"
@@ -532,7 +638,7 @@ public class ProductRuleController {
                               "ruleType": "TRANSACTION_LIMIT",
                               "ruleExpression": "sum(daily_withdrawals) <= 1000",
                               "rulePriority": 3,
-                              "errorMessage": "Daily withdrawal limit of $1,000 has been exceeded. Please try again tomorrow.",
+                              "errorMessage": "Daily withdrawal limit of ₹1,00,000 has been exceeded. Please try again tomorrow.",
                               "isActive": true,
                               "createdAt": "2025-01-01T00:00:00",
                               "updatedAt": "2025-01-01T00:00:00"
@@ -671,7 +777,7 @@ public class ProductRuleController {
                               "ruleType": "VALIDATION",
                               "ruleExpression": "balance >= 500",
                               "rulePriority": 2,
-                              "errorMessage": "Account balance must be at least $500 to avoid monthly fees",
+                              "errorMessage": "Account balance must be at least ₹50,000 to avoid monthly fees",
                               "isActive": true,
                               "createdAt": "2025-01-01T00:00:00",
                               "updatedAt": "2025-10-15T14:30:00"
@@ -688,7 +794,7 @@ public class ProductRuleController {
                               "ruleType": "TRANSACTION_LIMIT",
                               "ruleExpression": "sum(daily_withdrawals) <= 1000",
                               "rulePriority": 3,
-                              "errorMessage": "Daily withdrawal limit of $1,000 has been exceeded.",
+                              "errorMessage": "Daily withdrawal limit of ₹1,00,000 has been exceeded.",
                               "isActive": false,
                               "createdAt": "2025-01-01T00:00:00",
                               "updatedAt": "2025-10-15T14:35:00"
@@ -771,14 +877,14 @@ public class ProductRuleController {
                     examples = {
                         @ExampleObject(
                             name = "Increase Balance Requirement",
-                            summary = "Update minimum balance from $100 to $500",
+                            summary = "Update minimum balance from ₹10,000 to ₹50,000",
                             value = """
                                 {
                                   "ruleName": "Minimum Balance Requirement",
                                   "ruleType": "VALIDATION",
                                   "ruleExpression": "balance >= 500",
                                   "rulePriority": 2,
-                                  "errorMessage": "Account balance must be at least $500 to avoid monthly fees",
+                                  "errorMessage": "Account balance must be at least ₹50,000 to avoid monthly fees",
                                   "isActive": true
                                 }
                                 """
@@ -792,7 +898,7 @@ public class ProductRuleController {
                                   "ruleType": "TRANSACTION_LIMIT",
                                   "ruleExpression": "sum(daily_withdrawals) <= 1000",
                                   "rulePriority": 3,
-                                  "errorMessage": "Daily withdrawal limit of $1,000 has been exceeded.",
+                                  "errorMessage": "Daily withdrawal limit of ₹1,00,000 has been exceeded.",
                                   "isActive": false
                                 }
                                 """

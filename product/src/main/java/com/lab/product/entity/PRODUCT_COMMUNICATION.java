@@ -36,4 +36,7 @@ public class PRODUCT_COMMUNICATION extends AuditLoggable {
 
     @Column(columnDefinition = "TEXT")
     private String template; // The message template
+    
+    @Column
+    private Integer frequencyLimit; // Maximum number of times this communication can be sent within a time period
 }

@@ -45,7 +45,7 @@ public class ProductChargeController {
             percentage-based, with various frequency options.
             
             **Charge Types:**
-            - **FLAT**: Fixed amount (e.g., $5 monthly maintenance fee)
+            - **FLAT**: Fixed amount (e.g., ₹500 monthly maintenance fee)
             - **PERCENTAGE**: Percentage of amount (e.g., 2% transaction fee)
             
             **Frequency Options:**
@@ -58,30 +58,30 @@ public class ProductChargeController {
             **Common Charge Examples:**
             
             **Savings Account:**
-            - Minimum balance fee: $5 FLAT, MONTHLY
-            - ATM fee: $2 FLAT, PER_OCCURRENCE
-            - Account closure: $25 FLAT, ONE_TIME
+            - Minimum balance fee: ₹500 FLAT, MONTHLY
+            - ATM fee: ₹200 FLAT, PER_OCCURRENCE
+            - Account closure: ₹2,500 FLAT, ONE_TIME
             
             **Loan Product:**
             - Origination fee: 2% PERCENTAGE, ONE_TIME
-            - Late payment penalty: $35 FLAT, PER_OCCURRENCE
+            - Late payment penalty: ₹3,500 FLAT, PER_OCCURRENCE
             - Prepayment penalty: 1% PERCENTAGE, PER_OCCURRENCE
             
             **Current Account:**
-            - Monthly maintenance: $10 FLAT, MONTHLY
-            - Checkbook fee: $15 FLAT, PER_OCCURRENCE
-            - Wire transfer: $25 FLAT, PER_OCCURRENCE
+            - Monthly maintenance: ₹1,000 FLAT, MONTHLY
+            - Checkbook fee: ₹1,500 FLAT, PER_OCCURRENCE
+            - Wire transfer: ₹2,500 FLAT, PER_OCCURRENCE
             
             **Use Cases:**
             
             **Scenario 1: Account Maintenance Fee**
             - Monthly fee for low balance accounts
-            - $5 flat fee charged monthly
+            - ₹500 flat fee charged monthly
             - Waived if min balance maintained
             
             **Scenario 2: Transaction Charges**
             - Fee per wire transfer
-            - $25 flat fee per occurrence
+            - ₹2,500 flat fee per occurrence
             - Applied immediately on transaction
             
             **Scenario 3: Loan Origination Fee**
@@ -105,7 +105,39 @@ public class ProductChargeController {
                 schema = @Schema(implementation = ProductChargeDTO.class),
                 examples = {
                     @ExampleObject(
-                        name = "Monthly Maintenance Fee",
+                        name = "FD001 Quarterly Fee Created",
+                        summary = "Fixed Deposit quarterly maintenance fee",
+                        value = """
+                            {
+                              "chargeId": "13c4bb9f-ae57-4c3c-95fd-2ae81be8c1e1",
+                              "chargeCode": "FEE001",
+                              "chargeName": "FD Quarterly Fee",
+                              "chargeType": "FLAT",
+                              "chargeAmount": 200.00,
+                              "chargeFrequency": "QUARTERLY",
+                              "isActive": true,
+                              "createdAt": "2025-10-15T10:30:00"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "FD001 Low Penalty Created",
+                        summary = "Fixed Deposit premature withdrawal penalty (low)",
+                        value = """
+                            {
+                              "chargeId": "f72c49ef-e5eb-442c-b76d-14ad7e3ecbbf",
+                              "chargeCode": "PEN-L-001",
+                              "chargeName": "Penalty for premature withdrawal of FD - low",
+                              "chargeType": "PERCENTAGE",
+                              "chargeAmount": 0.5,
+                              "chargeFrequency": "PER_OCCURRENCE",
+                              "isActive": true,
+                              "createdAt": "2025-10-15T10:31:00"
+                            }
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "Savings Maintenance Fee",
                         value = """
                             {
                               "chargeId": "771e8400-e29b-41d4-a716-446655440001",
@@ -115,20 +147,6 @@ public class ProductChargeController {
                               "chargeFrequency": "MONTHLY",
                               "isActive": true,
                               "createdAt": "2025-10-15T10:30:00"
-                            }
-                            """
-                    ),
-                    @ExampleObject(
-                        name = "Loan Origination Fee",
-                        value = """
-                            {
-                              "chargeId": "772e8400-e29b-41d4-a716-446655440002",
-                              "chargeName": "Origination Fee",
-                              "chargeType": "PERCENTAGE",
-                              "chargeAmount": 2.00,
-                              "chargeFrequency": "ONE_TIME",
-                              "isActive": true,
-                              "createdAt": "2025-10-15T10:31:00"
                             }
                             """
                     )
@@ -208,32 +226,72 @@ public class ProductChargeController {
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = Page.class),
-                examples = @ExampleObject(
-                    value = """
-                        {
-                          "content": [
+                examples = {
+                    @ExampleObject(
+                        name = "FD001 Charges",
+                        summary = "Fixed Deposit under 500000 - Penalty and maintenance fees",
+                        value = """
                             {
-                              "chargeId": "771e8400-e29b-41d4-a716-446655440001",
-                              "chargeName": "Minimum Balance Fee",
-                              "chargeType": "FLAT",
-                              "chargeAmount": 5.00,
-                              "chargeFrequency": "MONTHLY",
-                              "isActive": true
-                            },
-                            {
-                              "chargeId": "772e8400-e29b-41d4-a716-446655440002",
-                              "chargeName": "ATM Withdrawal Fee",
-                              "chargeType": "FLAT",
-                              "chargeAmount": 2.00,
-                              "chargeFrequency": "PER_OCCURRENCE",
-                              "isActive": true
+                              "content": [
+                                {
+                                  "chargeId": "31435394-2af5-4118-9cc7-4616df6a64ee",
+                                  "chargeCode": "FEE001",
+                                  "chargeType": "FEE",
+                                  "calculationType": "FLAT",
+                                  "frequency": "QUARTERLY",
+                                  "amount": 200
+                                },
+                                {
+                                  "chargeId": "9953d914-423c-45af-936b-ebffbdd709be",
+                                  "chargeCode": "PEN-L-001",
+                                  "chargeType": "PENALTY",
+                                  "calculationType": "PERCENTAGE",
+                                  "frequency": "ONE_TIME",
+                                  "amount": 0.5
+                                },
+                                {
+                                  "chargeId": "e0167e4b-0102-4d8c-ad37-02ddb1e0f83d",
+                                  "chargeCode": "PEN-H-001",
+                                  "chargeType": "PENALTY",
+                                  "calculationType": "PERCENTAGE",
+                                  "frequency": "ONE_TIME",
+                                  "amount": 1
+                                }
+                              ],
+                              "totalElements": 3,
+                              "totalPages": 1
                             }
-                          ],
-                          "totalElements": 2,
-                          "totalPages": 1
-                        }
-                        """
-                )
+                            """
+                    ),
+                    @ExampleObject(
+                        name = "Savings Account Charges",
+                        summary = "Standard savings account fees",
+                        value = """
+                            {
+                              "content": [
+                                {
+                                  "chargeId": "771e8400-e29b-41d4-a716-446655440001",
+                                  "chargeName": "Minimum Balance Fee",
+                                  "chargeType": "FLAT",
+                                  "chargeAmount": 5.00,
+                                  "chargeFrequency": "MONTHLY",
+                                  "isActive": true
+                                },
+                                {
+                                  "chargeId": "772e8400-e29b-41d4-a716-446655440002",
+                                  "chargeName": "ATM Withdrawal Fee",
+                                  "chargeType": "FLAT",
+                                  "chargeAmount": 2.00,
+                                  "chargeFrequency": "PER_OCCURRENCE",
+                                  "isActive": true
+                                }
+                              ],
+                              "totalElements": 2,
+                              "totalPages": 1
+                            }
+                            """
+                    )
+                }
             )
         ),
         @ApiResponse(responseCode = "404", description = "Product not found")

@@ -14,4 +14,5 @@ public class ProductCommunicationDTO {
     private PRODUCT_COMM_CHANNEL channel;
     private String event;
     private String template;
+    private Integer frequencyLimit;
 }

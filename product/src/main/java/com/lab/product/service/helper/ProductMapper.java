@@ -181,6 +181,21 @@ public class ProductMapper {
                 pt.setAmountLimit(null);
                 return pt;
             }).collect(Collectors.toList()));
+        // Interests
+        if (product.getProductInterest() != null) {
+            dto.setProductInterests(product.getProductInterest().stream().map(t -> {
+                ProductInterestDTO pi = new ProductInterestDTO();
+                pi.setRateId(t.getRateId());
+                pi.setRateCode(t.getRateCode());
+                pi.setRateCumulative(t.getRateCumulative());
+                pi.setTermInMonths(t.getTermInMonths());
+                pi.setRateNonCumulativeMonthly(t.getRateNonCumulativeMonthly());
+                pi.setRateNonCumulativeQuarterly(t.getRateNonCumulativeQuarterly());
+                pi.setRateNonCumulativeYearly(t.getRateNonCumulativeYearly());
+                return pi;
+
+            }).collect(Collectors.toList()));
+        }
         }
 
         // balances - ledger schema components

@@ -6,13 +6,9 @@ import com.lab.product.DTO.ProductCommunicationDTO;
 import com.lab.product.DTO.ProductCommunicationRequestDTO;
 import com.lab.product.entity.PRODUCT_COMMUNICATION;
 import com.lab.product.entity.PRODUCT_DETAILS;
-import com.lab.product.entity.ENUMS.PRODUCT_COMM_TYPE;
-import com.lab.product.entity.ENUMS.PRODUCT_COMM_CHANNEL;
 import com.lab.product.Exception.ResourceNotFoundException;
 import com.lab.product.service.ProductCommunicationService;
 import com.lab.product.service.helper.ProductMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,12 +32,11 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
         PRODUCT_COMMUNICATION communication = new PRODUCT_COMMUNICATION();
         communication.setProduct(product);
         communication.setCommCode(communicationDto.getCommunicationCode());
-        communication.setCommunicationType(PRODUCT_COMM_TYPE.valueOf(communicationDto.getCommunicationType()));
-        // Set default values for required fields
-        communication.setChannel(PRODUCT_COMM_CHANNEL.EMAIL); // Default to EMAIL
+        communication.setCommunicationType(communicationDto.getCommunicationType());
+        communication.setChannel(communicationDto.getCommunicationChannel());
         communication.setEvent(communicationDto.getCommunicationCode());
         communication.setTemplate(communicationDto.getTemplateContent());
-
+        communication.setFrequencyLimit(communicationDto.getFrequencyLimit());
         PRODUCT_COMMUNICATION saved = communicationRepository.save(productMapper.fillAuditFields(communication));
         return productMapper.toCommunicationDto(saved);
     }
@@ -78,9 +73,11 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
                 .orElseThrow(() -> new ResourceNotFoundException("Communication not found: " + commCode));
 
         communication.setCommCode(communicationDto.getCommunicationCode());
-        communication.setCommunicationType(PRODUCT_COMM_TYPE.valueOf(communicationDto.getCommunicationType()));
+        communication.setCommunicationType(communicationDto.getCommunicationType());
+        communication.setChannel(communicationDto.getCommunicationChannel());
         communication.setEvent(communicationDto.getCommunicationCode());
         communication.setTemplate(communicationDto.getTemplateContent());
+        communication.setFrequencyLimit(communicationDto.getFrequencyLimit());
 
         PRODUCT_COMMUNICATION updated = communicationRepository.save(productMapper.fillAuditFields(communication));
         return productMapper.toCommunicationDto(updated);

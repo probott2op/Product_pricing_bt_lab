@@ -28,6 +28,7 @@ public class ProductDetailsDTO {
     private List<ProductTransactionDTO> productTransactions;
     private List<ProductBalanceDTO> productBalances;
     private List<ProductCommunicationDTO> productCommunications;
+    private List<ProductInterestDTO> productInterests;
     private LocalDateTime createdAt;
     private Date efctv_date;
 }

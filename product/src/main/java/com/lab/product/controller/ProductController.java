@@ -107,7 +107,7 @@ public class ProductController {
                               "productName": "High Yield Savings Account",
                               "productType": "SAVINGS",
                               "description": "Premium savings account with competitive interest rates",
-                              "currency": "USD",
+                              "currency": "INR",
                               "status": "ACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "DAILY",
@@ -118,14 +118,14 @@ public class ProductController {
                     ),
                     @ExampleObject(
                         name = "Fixed Deposit Product",
-                        summary = "1-year fixed deposit with quarterly compounding",
+                        summary = "Fixed deposit below 500000 with quarterly compounding",
                         value = """
                             {
-                              "productCode": "FD-1Y-2025",
-                              "productName": "1 Year Fixed Deposit",
-                              "productType": "DEPOSIT",
+                              "productCode": "FD001",
+                              "productName": "Fixed deposit below 500000",
+                              "productType": "FIXED_DEPOSIT",
                               "description": "Fixed deposit with guaranteed returns",
-                              "currency": "USD",
+                              "currency": "INR",
                               "status": "ACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "QUARTERLY",
@@ -138,11 +138,11 @@ public class ProductController {
                         summary = "Personal loan with monthly compound interest",
                         value = """
                             {
-                              "productCode": "LOAN-PERSONAL-5Y",
-                              "productName": "Personal Loan - 5 Years",
+                              "productCode": "LOAN-PERSONAL",
+                              "productName": "Personal Loan",
                               "productType": "LOAN",
-                              "description": "Unsecured personal loan up to $50,000",
-                              "currency": "USD",
+                              "description": "Unsecured personal loan up to ¥5,000,000",
+                              "currency": "JPY",
                               "status": "ACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "MONTHLY",
@@ -159,7 +159,7 @@ public class ProductController {
                               "productName": "Business Current Account",
                               "productType": "CURRENT",
                               "description": "Zero-balance business account with unlimited transactions",
-                              "currency": "USD",
+                              "currency": "AED",
                               "status": "ACTIVE",
                               "efctv_date": "2025-01-01"
                             }
@@ -186,7 +186,7 @@ public class ProductController {
                               "productCode": "SAV-HIGH-YIELD-2025",
                               "productName": "High Yield Savings Account",
                               "productType": "SAVINGS",
-                              "currency": "USD",
+                              "currency": "INR",
                               "status": "ACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "DAILY",
@@ -210,7 +210,7 @@ public class ProductController {
                               "productCode": "LOAN-PERSONAL-5Y",
                               "productName": "Personal Loan - 5 Years",
                               "productType": "LOAN",
-                              "currency": "USD",
+                              "currency": "INR",
                               "status": "ACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "MONTHLY",
@@ -360,7 +360,7 @@ public class ProductController {
                                   "productCode": "SAV-HIGH-YIELD-2025",
                                   "productName": "High Yield Savings Account",
                                   "productType": "SAVINGS",
-                                  "currency": "USD",
+                                  "currency": "INR",
                                   "status": "ACTIVE",
                                   "interestType": "COMPOUND",
                                   "compoundingFrequency": "DAILY",
@@ -374,7 +374,7 @@ public class ProductController {
                                   "productCode": "FD-1Y-2025",
                                   "productName": "1 Year Fixed Deposit",
                                   "productType": "DEPOSIT",
-                                  "currency": "USD",
+                                  "currency": "INR",
                                   "status": "ACTIVE",
                                   "interestType": "COMPOUND",
                                   "compoundingFrequency": "QUARTERLY",
@@ -388,7 +388,7 @@ public class ProductController {
                                   "productCode": "LOAN-PERSONAL-5Y",
                                   "productName": "Personal Loan - 5 Years",
                                   "productType": "LOAN",
-                                  "currency": "USD",
+                                  "currency": "INR",
                                   "status": "ACTIVE",
                                   "interestType": "COMPOUND",
                                   "compoundingFrequency": "MONTHLY",
@@ -551,104 +551,276 @@ public class ProductController {
                 schema = @Schema(implementation = ProductDetailsDTO.class),
                 examples = {
                     @ExampleObject(
-                        name = "Complete Savings Product",
-                        summary = "High Yield Savings with daily compounding",
+                        name = "Fixed deposit under 500000",
+                        summary = "Fixed deposit with under 500000 with Quarterly compounding",
                         value = """
-                            {
-                              "productId": "550e8400-e29b-41d4-a716-446655440000",
-                              "productCode": "SAV-HIGH-YIELD-2025",
-                              "productName": "High Yield Savings Account",
-                              "productType": "SAVINGS",
-                              "productDescription": "Premium savings account with competitive interest rates",
-                              "currency": "USD",
-                              "status": "ACTIVE",
-                              "interestType": "COMPOUND",
-                              "compoundingFrequency": "DAILY",
-                              "effectiveStartDate": "2025-01-01",
-                              "effectiveEndDate": null,
-                              "productInterest": [
                                 {
-                                  "interestId": "661e8400-e29b-41d4-a716-446655440001",
-                                  "tierName": "Tier 1",
-                                  "minBalance": 0.00,
-                                  "maxBalance": 10000.00,
-                                  "interestRate": 3.50,
-                                  "isActive": true
-                                },
-                                {
-                                  "interestId": "662e8400-e29b-41d4-a716-446655440002",
-                                  "tierName": "Tier 2",
-                                  "minBalance": 10000.01,
-                                  "maxBalance": 50000.00,
-                                  "interestRate": 4.00,
-                                  "isActive": true
+                                  "productId": "7fd263eb-1553-46d7-b4ce-60811521229a",
+                                  "productCode": "FD001",
+                                  "productName": "Fixed Deposit under 500000",
+                                  "productType": "FIXED_DEPOSIT",
+                                  "currency": "INR",
+                                  "status": "ACTIVE",
+                                  "interestType": "COMPOUND",
+                                  "compoundingFrequency": "QUARTERLY",
+                                  "productRules": [
+                                    {
+                                      "ruleId": "1baae6cf-106a-444d-b7a7-85b889f329d8",
+                                      "ruleCode": "JR001",
+                                      "ruleName": "Extra Interest for under 18",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "PERCENTAGE",
+                                      "ruleValue": "0.5",
+                                      "validationType": "EXACT"
+                                    },
+                                    {
+                                      "ruleId": "363ffabc-0827-46d3-bcd1-adae3f42ffe3",
+                                      "ruleCode": "MAXINT001",
+                                      "ruleName": "Maximum excess interest",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "PERCENTAGE",
+                                      "ruleValue": "2",
+                                      "validationType": "MIN_MAX"
+                                    },
+                                    {
+                                      "ruleId": "37fe7f8a-d9ea-4661-8ac9-dc3dc3ea5dcd",
+                                      "ruleCode": "MAX001",
+                                      "ruleName": "Maximum for FD001",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "NUMBER",
+                                      "ruleValue": "500000",
+                                      "validationType": "MIN_MAX"
+                                    },
+                                    {
+                                      "ruleId": "473f6407-6378-412e-8ef4-b579e362d83a",
+                                      "ruleCode": "GOLD001",
+                                      "ruleName": "Gold members extra interest",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "NUMBER",
+                                      "ruleValue": "1",
+                                      "validationType": "EXACT"
+                                    },
+                                    {
+                                      "ruleId": "6c4879fc-9650-4762-bdff-28c3fbf8177f",
+                                      "ruleCode": "SIL001",
+                                      "ruleName": "Silver members extra interest",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "NUMBER",
+                                      "ruleValue": "0.5",
+                                      "validationType": "EXACT"
+                                    },
+                                    {
+                                      "ruleId": "a9e3f3f3-a120-41a3-8e5e-b2c1f0b5e080",
+                                      "ruleCode": "MIN001",
+                                      "ruleName": "Minimum for FD001",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "NUMBER",
+                                      "ruleValue": "10000",
+                                      "validationType": "MIN_MAX"
+                                    },
+                                    {
+                                      "ruleId": "c478c7af-9d64-41a6-b2e2-45552054c85d",
+                                      "ruleCode": "SR001",
+                                      "ruleName": "Extra Interest for sr",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "PERCENTAGE",
+                                      "ruleValue": "0.75",
+                                      "validationType": "EXACT"
+                                    },
+                                    {
+                                      "ruleId": "d77a6842-2296-40cc-af4b-81b72c770e61",
+                                      "ruleCode": "EMP001",
+                                      "ruleName": "Employee members extra interest",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "NUMBER",
+                                      "ruleValue": "1.5",
+                                      "validationType": "EXACT"
+                                    },
+                                    {
+                                      "ruleId": "fb409ac1-149f-4163-8e88-835da99bb8bc",
+                                      "ruleCode": "DY001",
+                                      "ruleName": "Extra Interest for Digi Youth",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "PERCENTAGE",
+                                      "ruleValue": "0.25",
+                                      "validationType": "EXACT"
+                                    },
+                                    {
+                                      "ruleId": "fe956b24-a359-4c26-bafd-05855e669851",
+                                      "ruleCode": "PLAT001",
+                                      "ruleName": "Platinum members extra interest",
+                                      "ruleType": "SIMPLE",
+                                      "dataType": "NUMBER",
+                                      "ruleValue": "1.5",
+                                      "validationType": "EXACT"
+                                    }
+                                  ],
+                                  "productCharges": [
+                                    {
+                                      "chargeId": "31435394-2af5-4118-9cc7-4616df6a64ee",
+                                      "chargeCode": "FEE001",
+                                      "chargeType": "FEE",
+                                      "calculationType": "FLAT",
+                                      "frequency": "QUARTERLY",
+                                      "amount": 200
+                                    },
+                                    {
+                                      "chargeId": "9953d914-423c-45af-936b-ebffbdd709be",
+                                      "chargeCode": "PEN-L-001",
+                                      "chargeType": "PENALTY",
+                                      "calculationType": "PERCENTAGE",
+                                      "frequency": "ONE_TIME",
+                                      "amount": 0.5
+                                    },
+                                    {
+                                      "chargeId": "e0167e4b-0102-4d8c-ad37-02ddb1e0f83d",
+                                      "chargeCode": "PEN-H-001",
+                                      "chargeType": "PENALTY",
+                                      "calculationType": "PERCENTAGE",
+                                      "frequency": "ONE_TIME",
+                                      "amount": 1
+                                    }
+                                  ],
+                                  "productRoles": [
+                                    {
+                                      "roleId": "f1097ab9-789c-4bf2-984a-eaa6d42b1fed",
+                                      "roleCode": "ROLE001",
+                                      "roleType": "OWNER",
+                                      "roleName": "OWNER"
+                                    }
+                                  ],
+                                  "productTransactions": [
+                                    {
+                                      "transactionId": "3e6dcd5d-1615-4e93-8cd3-dc9a2bf8713f",
+                                      "transactionCode": "FD_DEPOSIT",
+                                      "transactionType": "DEPOSIT",
+                                      "amountLimit": null
+                                    }
+                                  ],
+                                  "productBalances": [
+                                    {
+                                      "balanceId": "1360a975-0102-40d1-87d9-047c927dc794",
+                                      "balanceType": "FD_INTEREST",
+                                      "isActive": true,
+                                      "createdAt": "2025-10-19T18:44:59.9126"
+                                    },
+                                    {
+                                      "balanceId": "88b934e7-9688-49c1-9c59-0fbff87be971",
+                                      "balanceType": "FD_PRINCIPAL",
+                                      "isActive": true,
+                                      "createdAt": "2025-10-19T18:45:23.47411"
+                                    },
+                                    {
+                                      "balanceId": "bbb417ac-fd89-4243-a995-47746d0980b7",
+                                      "balanceType": "PENALTY",
+                                      "isActive": true,
+                                      "createdAt": "2025-10-19T18:45:40.10681"
+                                    }
+                                  ],
+                                  "productCommunications": [
+                                    {
+                                      "commId": "d3ba2f49-7801-4c63-99bd-4e64e5f7c155",
+                                      "commCode": "COMM_MONTHLY_STATEMENT",
+                                      "communicationType": "STATEMENT",
+                                      "channel": "EMAIL",
+                                      "event": "COMM_MONTHLY_STATEMENT",
+                                      "template": "Dear ${CUSTOMER_NAME}, Your monthly statement for ${PRODUCT_NAME} account ending in ${LAST_4_DIGITS} is now available. Opening balance: ${OPENING_BALANCE}, Closing balance: ${CLOSING_BALANCE}. View full statement in the attachment.",
+                                      "frequencyLimit": null
+                                    }
+                                  ],
+                                  "productInterests": [
+                                    {
+                                      "rateId": "6c433990-8040-47e9-ba5e-d609b2e273d6",
+                                      "rateCode": "INT36M001",
+                                      "termInMonths": 36,
+                                      "rateCumulative": 8,
+                                      "rateNonCumulativeMonthly": 7.85,
+                                      "rateNonCumulativeQuarterly": 7.9,
+                                      "rateNonCumulativeYearly": 7.8
+                                    },
+                                    {
+                                      "rateId": "953cb07f-40e3-477e-93c4-21aab0a9d387",
+                                      "rateCode": "INT24M001",
+                                      "termInMonths": 24,
+                                      "rateCumulative": 7.7,
+                                      "rateNonCumulativeMonthly": 7.5,
+                                      "rateNonCumulativeQuarterly": 7.6,
+                                      "rateNonCumulativeYearly": 7.7
+                                    },
+                                    {
+                                      "rateId": "e75bed67-db57-405d-9f35-0af9d0d62e70",
+                                      "rateCode": "INT12M001",
+                                      "termInMonths": 12,
+                                      "rateCumulative": 7.6,
+                                      "rateNonCumulativeMonthly": 7.4,
+                                      "rateNonCumulativeQuarterly": 7.5,
+                                      "rateNonCumulativeYearly": 7.6
+                                    },
+                                    {
+                                      "rateId": "fd3feafa-b19b-4540-b42d-c0fa1efdadd6",
+                                      "rateCode": "INT60M001",
+                                      "termInMonths": 60,
+                                      "rateCumulative": 8.5,
+                                      "rateNonCumulativeMonthly": 8.3,
+                                      "rateNonCumulativeQuarterly": 8.4,
+                                      "rateNonCumulativeYearly": 8.5
+                                    }
+                                  ],
+                                  "createdAt": "2025-10-09T11:38:44.950171",
+                                  "efctv_date": null
                                 }
-                              ],
-                              "productCharges": [
-                                {
-                                  "chargeId": "771e8400-e29b-41d4-a716-446655440003",
-                                  "chargeName": "Minimum Balance Fee",
-                                  "chargeType": "FLAT",
-                                  "chargeAmount": 5.00,
-                                  "chargeFrequency": "MONTHLY",
-                                  "isActive": true
-                                }
-                              ],
-                              "productBalances": [
-                                {
-                                  "balanceId": "881e8400-e29b-41d4-a716-446655440004",
-                                  "balanceType": "FD_PRINCIPAL",
-                                  "isActive": true
-                                },
-                                {
-                                  "balanceId": "882e8400-e29b-41d4-a716-446655440005",
-                                  "balanceType": "FD_INTEREST",
-                                  "isActive": true
-                                }
-                              ],
-                              "productRules": [],
-                              "productTransactions": [],
-                              "productRoles": [],
-                              "productCommunications": [],
-                              "createdAt": "2025-01-01T00:00:00",
-                              "updatedAt": "2025-01-15T10:30:00"
-                            }
                             """
                     ),
+                        @ExampleObject(
+                                name = "FD for above 500000",
+                                summary = "Fixed deposit for above 500000 with QUARTERLY compoudning",
+                                value = """
+                                        {
+                                          "productId": "ca008622-c7d2-4679-a77d-d60a17baefff",
+                                          "productCode": "FD002",
+                                          "productName": "FD for above 500000 ",
+                                          "productType": "FIXED_DEPOSIT",
+                                          "currency": "INR",
+                                          "status": "ACTIVE",
+                                          "interestType": "COMPOUND",
+                                          "compoundingFrequency": "QUARTERLY",
+                                          "productRules": [],
+                                          "productCharges": [],
+                                          "productRoles": [],
+                                          "productTransactions": [],
+                                          "productBalances": [],
+                                          "productCommunications": [],
+                                          "productInterests": [],
+                                          "createdAt": "2025-10-16T09:54:40.583654",
+                                          "efctv_date": null
+                                        }
+                                        """
+                        ),
                     @ExampleObject(
                         name = "Personal Loan Product",
-                        summary = "5-year personal loan with monthly compounding",
+                        summary = "personal loan with monthly compounding below ¥500000",
                         value = """
                             {
                               "productId": "770e8400-e29b-41d4-a716-446655440222",
-                              "productCode": "LOAN-PERSONAL-5Y",
-                              "productName": "Personal Loan - 5 Years",
+                              "productCode": "LOAN-PERSONAL-LOW-JPY-25",
+                              "productName": "Personal Loan below ¥500000",
                               "productType": "LOAN",
-                              "productDescription": "Unsecured personal loan up to $50,000",
-                              "currency": "USD",
+                              "productDescription": "Unsecured personal loan up to ¥500,000",
+                              "currency": "JPY",
                               "status": "ACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "MONTHLY",
                               "effectiveStartDate": "2025-01-01",
                               "effectiveEndDate": null,
-                              "productInterest": [
-                                {
-                                  "interestId": "663e8400-e29b-41d4-a716-446655440010",
-                                  "tierName": "Standard Rate",
-                                  "minBalance": 0.00,
-                                  "maxBalance": 999999999.99,
-                                  "interestRate": 8.50,
-                                  "isActive": true
-                                }
-                              ],
                               "productCharges": [
                                 {
                                   "chargeId": "772e8400-e29b-41d4-a716-446655440011",
+                                  "ChargeCode": "ORG-FEE-LOAN",
                                   "chargeName": "Origination Fee",
-                                  "chargeType": "PERCENTAGE",
-                                  "chargeAmount": 2.00,
-                                  "chargeFrequency": "ONE_TIME",
-                                  "isActive": true
+                                  "chargeType": "FEE",
+                                  "calculationType": "PERCENTAGE",
+                                  "frequency": "ONE_TIME",
+                                  "amount": 2.00
                                 },
                                 {
                                   "chargeId": "773e8400-e29b-41d4-a716-446655440012",
@@ -680,6 +852,7 @@ public class ProductController {
                               "productTransactions": [],
                               "productRoles": [],
                               "productCommunications": [],
+                              "productInterests": [],
                               "createdAt": "2025-01-01T00:00:00",
                               "updatedAt": "2025-01-10T14:20:00"
                             }
@@ -732,14 +905,13 @@ public class ProductController {
                     
                     Examples:
                     - SAV-HIGH-YIELD-2025
-                    - FD-1Y-2025
-                    - LOAN-PERSONAL-5Y
+                    - FD001
                     - CURR-BUSINESS-2025
                     
                     Format: Usually {TYPE}-{VARIANT}-{YEAR}
                     """,
                 required = true,
-                example = "SAV-HIGH-YIELD-2025"
+                example = "FD001"
             )
             @PathVariable String productCode) {
         return ResponseEntity.ok(productService.getProductByCode(productCode));
@@ -825,7 +997,7 @@ public class ProductController {
                               "productName": "High Yield Savings Account",
                               "productType": "SAVINGS",
                               "productDescription": "Premium savings account (discontinued)",
-                              "currency": "USD",
+                              "currency": "INR",
                               "status": "INACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "DAILY",
@@ -846,7 +1018,7 @@ public class ProductController {
                               "productName": "1 Year Fixed Deposit - Enhanced",
                               "productType": "DEPOSIT",
                               "productDescription": "Now with monthly compounding for better returns",
-                              "currency": "USD",
+                              "currency": "INR",
                               "status": "ACTIVE",
                               "interestType": "COMPOUND",
                               "compoundingFrequency": "MONTHLY",
@@ -1197,7 +1369,7 @@ public class ProductController {
                                 "productCode": "SAV-HIGH-YIELD-2025",
                                 "productName": "High Yield Savings Account",
                                 "productType": "SAVINGS",
-                                "currency": "USD",
+                                "currency": "INR",
                                 "status": "ACTIVE",
                                 "interestType": "COMPOUND",
                                 "compoundingFrequency": "DAILY",
@@ -1210,7 +1382,7 @@ public class ProductController {
                                 "productCode": "SAV-REGULAR-2025",
                                 "productName": "Regular Savings Account",
                                 "productType": "SAVINGS",
-                                "currency": "USD",
+                                "currency": "INR",
                                 "status": "ACTIVE",
                                 "interestType": "SIMPLE",
                                 "compoundingFrequency": null,
@@ -1231,7 +1403,7 @@ public class ProductController {
                                 "productCode": "FD-1Y-2025",
                                 "productName": "1 Year Fixed Deposit",
                                 "productType": "DEPOSIT",
-                                "currency": "USD",
+                                "currency": "INR",
                                 "status": "ACTIVE",
                                 "interestType": "COMPOUND",
                                 "compoundingFrequency": "QUARTERLY",
@@ -1244,7 +1416,7 @@ public class ProductController {
                                 "productCode": "FD-3Y-2025",
                                 "productName": "3 Year Fixed Deposit",
                                 "productType": "DEPOSIT",
-                                "currency": "USD",
+                                "currency": "INR",
                                 "status": "ACTIVE",
                                 "interestType": "COMPOUND",
                                 "compoundingFrequency": "QUARTERLY",
