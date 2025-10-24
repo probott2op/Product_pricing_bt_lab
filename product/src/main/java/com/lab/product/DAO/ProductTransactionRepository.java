@@ -35,9 +35,11 @@ public interface ProductTransactionRepository extends JpaRepository<PRODUCT_TRAN
     Optional<PRODUCT_TRANSACTION> findByProductCodeAndTransactionCode(@Param("productCode") String productCode, 
                                                                        @Param("transactionCode") String transactionCode);
     
-    // Legacy methods - maintained for backward compatibility
+    // INSERT-ONLY Pattern: Find latest non-deleted versions for each transactionCode by product
     @Query("SELECT t FROM PRODUCT_TRANSACTION t WHERE t.product = :product " +
-           "AND t.crud_value != 'D'")
+           "AND t.crud_value != 'D' " +
+           "AND t.createdAt = (SELECT MAX(t2.createdAt) FROM PRODUCT_TRANSACTION t2 " +
+           "WHERE t2.transactionCode = t.transactionCode AND t2.crud_value != 'D')")
     Page<PRODUCT_TRANSACTION> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
     @Query("SELECT t FROM PRODUCT_TRANSACTION t WHERE t.product = :product " +

@@ -35,9 +35,11 @@ public interface ProductRoleRepository extends JpaRepository<PRODUCT_ROLE, UUID>
     Optional<PRODUCT_ROLE> findByProductCodeAndRoleCode(@Param("productCode") String productCode, 
                                                          @Param("roleCode") String roleCode);
     
-    // Legacy methods - maintained for backward compatibility
+    // INSERT-ONLY Pattern: Find latest non-deleted versions for each roleCode by product
     @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
-           "AND r.crud_value != 'D'")
+           "AND r.crud_value != 'D' " +
+           "AND r.createdAt = (SELECT MAX(r2.createdAt) FROM PRODUCT_ROLE r2 " +
+           "WHERE r2.roleCode = r.roleCode AND r2.crud_value != 'D')")
     Page<PRODUCT_ROLE> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
     @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +

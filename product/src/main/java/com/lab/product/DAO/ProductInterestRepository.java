@@ -35,9 +35,11 @@ public interface ProductInterestRepository extends JpaRepository<PRODUCT_INTERES
     Optional<PRODUCT_INTEREST> findByProductCodeAndRateCode(@Param("productCode") String productCode, 
                                                              @Param("rateCode") String rateCode);
     
-    // Legacy methods - maintained for backward compatibility
+    // INSERT-ONLY Pattern: Find latest non-deleted versions for each rateCode by product
     @Query("SELECT i FROM PRODUCT_INTEREST i WHERE i.product = :product " +
-           "AND i.crud_value != 'D'")
+           "AND i.crud_value != 'D' " +
+           "AND i.createdAt = (SELECT MAX(i2.createdAt) FROM PRODUCT_INTEREST i2 " +
+           "WHERE i2.rateCode = i.rateCode AND i2.crud_value != 'D')")
     Page<PRODUCT_INTEREST> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
     @Query("SELECT i FROM PRODUCT_INTEREST i WHERE i.product = :product " +

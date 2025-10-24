@@ -28,7 +28,7 @@ public class PRODUCT_DETAILS extends AuditLoggable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID productId;
 
-    @Column(name = "PRODUCT_CODE", unique = true, nullable = false, length = 50)
+    @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
     private String productCode;
 
     @Column(name = "PRODUCT_NAME", nullable = false)

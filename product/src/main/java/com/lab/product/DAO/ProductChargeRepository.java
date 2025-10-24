@@ -35,9 +35,11 @@ public interface ProductChargeRepository extends JpaRepository<PRODUCT_CHARGES, 
     Optional<PRODUCT_CHARGES> findByProductCodeAndChargeCode(@Param("productCode") String productCode, 
                                                               @Param("chargeCode") String chargeCode);
     
-    // Legacy methods - maintained for backward compatibility
+    // INSERT-ONLY Pattern: Find latest non-deleted versions for each chargeCode by product
     @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
-           "AND c.crud_value != 'D'")
+           "AND c.crud_value != 'D' " +
+           "AND c.createdAt = (SELECT MAX(c2.createdAt) FROM PRODUCT_CHARGES c2 " +
+           "WHERE c2.chargeCode = c.chargeCode AND c2.crud_value != 'D')")
     Page<PRODUCT_CHARGES> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
     @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +

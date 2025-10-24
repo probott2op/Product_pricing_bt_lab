@@ -21,11 +21,11 @@ public class PRODUCT_TRANSACTION extends AuditLoggable {
     @JoinColumn(name = "product_id", nullable = false)
     private PRODUCT_DETAILS product;
     
-    // INSERT-ONLY Pattern: Business identifier for linking across versions
+        // INSERT-ONLY Pattern: Business identifier for linking across versions
     @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
     private String productCode;
-
-    @Column(nullable = false, unique = true, length = 50)
+    
+    @Column(nullable = false, length = 50)
     private String transactionCode; // e.g., "TXN_DEPOSIT", "TXN_WITHDRAWAL"
 
     @Enumerated(EnumType.STRING)

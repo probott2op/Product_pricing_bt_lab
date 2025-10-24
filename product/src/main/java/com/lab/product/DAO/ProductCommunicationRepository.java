@@ -45,9 +45,11 @@ public interface ProductCommunicationRepository extends JpaRepository<PRODUCT_CO
     List<PRODUCT_COMMUNICATION> findByProductCodeAndCommunicationType(@Param("productCode") String productCode, 
                                                                        @Param("communicationType") PRODUCT_COMM_TYPE communicationType);
     
-    // Legacy methods - maintained for backward compatibility
+    // INSERT-ONLY Pattern: Find latest non-deleted versions for each commCode by product
     @Query("SELECT c FROM PRODUCT_COMMUNICATION c WHERE c.product = :product " +
-           "AND c.crud_value != 'D'")
+           "AND c.crud_value != 'D' " +
+           "AND c.createdAt = (SELECT MAX(c2.createdAt) FROM PRODUCT_COMMUNICATION c2 " +
+           "WHERE c2.commCode = c.commCode AND c2.crud_value != 'D')")
     Page<PRODUCT_COMMUNICATION> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
     @Query("SELECT c FROM PRODUCT_COMMUNICATION c WHERE c.product = :product " +

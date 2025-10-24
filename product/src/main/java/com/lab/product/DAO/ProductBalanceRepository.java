@@ -36,9 +36,11 @@ public interface ProductBalanceRepository extends JpaRepository<PRODUCT_BALANCE,
     Optional<PRODUCT_BALANCE> findByProductCodeAndBalanceType(@Param("productCode") String productCode, 
                                                                @Param("balanceType") PRODUCT_BALANCE_TYPE balanceType);
     
-    // Legacy methods - maintained for backward compatibility
+    // INSERT-ONLY Pattern: Find latest non-deleted versions for each balanceType by product
     @Query("SELECT b FROM PRODUCT_BALANCE b WHERE b.product = :product " +
-           "AND b.crud_value != 'D'")
+           "AND b.crud_value != 'D' " +
+           "AND b.createdAt = (SELECT MAX(b2.createdAt) FROM PRODUCT_BALANCE b2 " +
+           "WHERE b2.balanceType = b.balanceType AND b2.crud_value != 'D')")
     Page<PRODUCT_BALANCE> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
     @Query("SELECT b FROM PRODUCT_BALANCE b WHERE b.product = :product " +

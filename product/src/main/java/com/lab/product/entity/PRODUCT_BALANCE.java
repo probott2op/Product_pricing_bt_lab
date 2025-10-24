@@ -15,8 +15,7 @@ import java.util.UUID;
  * This simply indicates which balances are relevant for the product.
  */
 @Entity
-@Table(name = "product_balances", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "balance_type"}))
+@Table(name = "product_balances")
 @Data
 @lombok.EqualsAndHashCode(callSuper = false)
 public class PRODUCT_BALANCE extends AuditLoggable {

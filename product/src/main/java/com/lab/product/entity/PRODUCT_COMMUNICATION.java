@@ -24,8 +24,8 @@ public class PRODUCT_COMMUNICATION extends AuditLoggable {
     @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
     private String productCode;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String commCode; // e.g., "COMM_ALERT_EMAIL", "COMM_STATEMENT_SMS"
+    @Column(nullable = false, length = 50)
+    private String commCode; // e.g., "COMM_WELCOME", "COMM_STATEMENT"
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

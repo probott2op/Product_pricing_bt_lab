@@ -25,8 +25,8 @@ public class PRODUCT_ROLE extends AuditLoggable {
     @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
     private String productCode;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String roleCode; // e.g., "ROLE_OWNER", "ROLE_NOMINEE"
+    @Column(nullable = false, length = 50)
+    private String roleCode; // e.g., "ROLE_PRIMARY_HOLDER", "ROLE_JOINT_HOLDER"
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

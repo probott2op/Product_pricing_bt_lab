@@ -27,7 +27,7 @@ public class PRODUCT_INTEREST extends AuditLoggable {
     @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
     private String productCode;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, length = 50)
     private String rateCode; // e.g., "RATE_12M", "RATE_36M"
 
     @Column(nullable = false)
