@@ -95,11 +95,11 @@ public class ProductMapper {
         return dto;
     }
     
-    public <T extends AuditLoggable> T fillAuditFields(T entity) {
+    // INSERT-ONLY Pattern: Fill audit fields for CREATE operation
+    public <T extends AuditLoggable> T fillAuditFieldsForCreate(T entity) {
         if (entity == null) return null;
         
-        // Set timestamps
-        entity.setCreatedAt(LocalDateTime.now());
+        // Set timestamps - createdAt serves as version timestamp via @CreationTimestamp
         entity.setHost_ts(new Timestamp(System.currentTimeMillis()));
         entity.setLocal_ts(new Timestamp(System.currentTimeMillis()));
         entity.setAcpt_ts(new Timestamp(System.currentTimeMillis()));
@@ -110,13 +110,66 @@ public class ProductMapper {
         entity.setWs_id("WS001");
         entity.setPrgm_id("PGM001");
         
-        // Set CRUD value - Using CREATE enum value
-        entity.setCrud_value(CRUD_VALUE.valueOf("C"));
+        // INSERT-ONLY Pattern: Set CRUD value to CREATE
+        entity.setCrud_value(CRUD_VALUE.C);
         
         // Set UUID reference
         entity.setUUID_reference(UUID.randomUUID());
         
         return entity;
+    }
+    
+    // INSERT-ONLY Pattern: Fill audit fields for UPDATE operation (creates new row)
+    public <T extends AuditLoggable> T fillAuditFieldsForUpdate(T entity) {
+        if (entity == null) return null;
+        
+        // Set timestamps - createdAt serves as version timestamp via @CreationTimestamp
+        entity.setHost_ts(new Timestamp(System.currentTimeMillis()));
+        entity.setLocal_ts(new Timestamp(System.currentTimeMillis()));
+        entity.setAcpt_ts(new Timestamp(System.currentTimeMillis()));
+        entity.setAcpt_ts_utc_ofst(new Timestamp(System.currentTimeMillis()));
+        
+        // Set dummy user info
+        entity.setUser_id("SYSTEM");
+        entity.setWs_id("WS001");
+        entity.setPrgm_id("PGM001");
+        
+        // INSERT-ONLY Pattern: Set CRUD value to UPDATE
+        entity.setCrud_value(CRUD_VALUE.U);
+        
+        // Set UUID reference
+        entity.setUUID_reference(UUID.randomUUID());
+        
+        return entity;
+    }
+    
+    // INSERT-ONLY Pattern: Fill audit fields for DELETE operation (creates new row)
+    public <T extends AuditLoggable> T fillAuditFieldsForDelete(T entity) {
+        if (entity == null) return null;
+        
+        // Set timestamps - createdAt serves as version timestamp via @CreationTimestamp
+        entity.setHost_ts(new Timestamp(System.currentTimeMillis()));
+        entity.setLocal_ts(new Timestamp(System.currentTimeMillis()));
+        entity.setAcpt_ts(new Timestamp(System.currentTimeMillis()));
+        entity.setAcpt_ts_utc_ofst(new Timestamp(System.currentTimeMillis()));
+        
+        // Set dummy user info
+        entity.setUser_id("SYSTEM");
+        entity.setWs_id("WS001");
+        entity.setPrgm_id("PGM001");
+        
+        // INSERT-ONLY Pattern: Set CRUD value to DELETE
+        entity.setCrud_value(CRUD_VALUE.D);
+        
+        // Set UUID reference
+        entity.setUUID_reference(UUID.randomUUID());
+        
+        return entity;
+    }
+    
+    // Legacy method - maintained for backward compatibility (defaults to CREATE)
+    public <T extends AuditLoggable> T fillAuditFields(T entity) {
+        return fillAuditFieldsForCreate(entity);
     }
 
     public ProductDetailsDTO toDto(PRODUCT_DETAILS product) {

@@ -24,6 +24,7 @@ public abstract class AuditLoggable {
     @Column(name = "PRODUCT_CRUD_VALUE")
     @Enumerated(EnumType.STRING)
     private CRUD_VALUE crud_value;
+    
     @Column(name = "PRODUCT_USER_ID")
     private String user_id;
     @Column(name = "PRODUCT_WS_ID")
@@ -44,5 +45,14 @@ public abstract class AuditLoggable {
     private Timestamp acpt_ts_utc_ofst;
     @Column(name = "PRODUCT_UUID")
     private UUID UUID_reference;
+    
+    // INSERT-ONLY Pattern: Set default crud_value on persist
+    // createdAt (PRODUCT_CRTN_DATE) serves as version timestamp via @CreationTimestamp
+    @PrePersist
+    protected void onCreate() {
+        if (crud_value == null) {
+            crud_value = CRUD_VALUE.C;
+        }
+    }
 
 }

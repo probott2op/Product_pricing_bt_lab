@@ -14,6 +14,7 @@ import com.lab.product.service.helper.ProductMapper;
 import com.lab.product.Exception.ResourceNotFoundException;
 import com.lab.product.Exception.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
@@ -39,7 +40,8 @@ public class ProductServiceImpl implements ProductService {
         validateProductRequest(requestDTO);
         
         PRODUCT_DETAILS entity = mapper.toEntity(requestDTO);
-        entity = mapper.fillAuditFields(entity);
+        // INSERT-ONLY Pattern: Use fillAuditFieldsForCreate for new products
+        entity = mapper.fillAuditFieldsForCreate(entity);
         
         // Set enums with validation
         try {
@@ -91,32 +93,43 @@ public class ProductServiceImpl implements ProductService {
         
         validateProductRequest(requestDTO);
         
-        PRODUCT_DETAILS existing = productDetailsRepository.findByProductCode(productCode)
+        // INSERT-ONLY Pattern: Find latest non-deleted version
+        PRODUCT_DETAILS existing = productDetailsRepository.findLatestByProductCode(productCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         
-        mapper.updateEntityFromDto(existing, requestDTO);
-        existing = mapper.fillAuditFields(existing);
+        // INSERT-ONLY Pattern: Create NEW object instead of modifying existing
+        PRODUCT_DETAILS newVersion = new PRODUCT_DETAILS();
+        // Copy all fields from existing (excluding productId - createdAt will be auto-set)
+        BeanUtils.copyProperties(existing, newVersion, "productId", "productRules", 
+                "productCharges", "productRoles", "productTransactions", "productBalances", 
+                "productCommunications", "productInterest");
+        
+        // Apply updates from DTO
+        mapper.updateEntityFromDto(newVersion, requestDTO);
         
         // Update enums with validation
         try {
             if (requestDTO.getProductType() != null) {
-                existing.setProductType(PRODUCT_TYPE.valueOf(requestDTO.getProductType()));
+                newVersion.setProductType(PRODUCT_TYPE.valueOf(requestDTO.getProductType()));
             }
             if (requestDTO.getStatus() != null) {
-                existing.setStatus(PRODUCT_STATUS.valueOf(requestDTO.getStatus()));
+                newVersion.setStatus(PRODUCT_STATUS.valueOf(requestDTO.getStatus()));
             }
             if (requestDTO.getInterestType() != null) {
-                existing.setInterestType(INTEREST_TYPE.valueOf(requestDTO.getInterestType()));
+                newVersion.setInterestType(INTEREST_TYPE.valueOf(requestDTO.getInterestType()));
             }
             if (requestDTO.getCompoundingFrequency() != null) {
-                existing.setCompoundingFrequency(COMPOUNDING_FREQUENCY.valueOf(requestDTO.getCompoundingFrequency()));
+                newVersion.setCompoundingFrequency(COMPOUNDING_FREQUENCY.valueOf(requestDTO.getCompoundingFrequency()));
             }
         } catch (IllegalArgumentException e) {
             throw new ValidationException("Invalid enum value: " + e.getMessage());
         }
+        
+        // INSERT-ONLY Pattern: Set audit fields for UPDATE operation
+        newVersion = mapper.fillAuditFieldsForUpdate(newVersion);
 
-        // Update basic product details only
-        PRODUCT_DETAILS saved = productDetailsRepository.save(existing);
+        // INSERT-ONLY Pattern: Save creates NEW row with same productCode but different productId
+        PRODUCT_DETAILS saved = productDetailsRepository.save(newVersion);
         return mapper.toDto(saved);
     }
 
@@ -129,7 +142,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDetailsDTO getProductByCode(String productCode) {
-        PRODUCT_DETAILS p = productDetailsRepository.findByProductCode(productCode)
+        // INSERT-ONLY Pattern: Use findLatestByProductCode to get current version
+        PRODUCT_DETAILS p = productDetailsRepository.findLatestByProductCode(productCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
         return mapper.toDto(p);
     }
@@ -183,10 +197,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(String productCode) {
-        PRODUCT_DETAILS product = productDetailsRepository.findByProductCode(productCode)
+        // INSERT-ONLY Pattern: Find latest non-deleted version
+        PRODUCT_DETAILS existing = productDetailsRepository.findLatestByProductCode(productCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
-        productDetailsRepository.delete(product);
+        
+        // INSERT-ONLY Pattern: Create NEW object for delete marker (soft delete)
+        PRODUCT_DETAILS deleteVersion = new PRODUCT_DETAILS();
+        // Copy all fields from existing (excluding productId - createdAt will be auto-set)
+        BeanUtils.copyProperties(existing, deleteVersion, "productId", "productRules", 
+                "productCharges", "productRoles", "productTransactions", "productBalances", 
+                "productCommunications", "productInterest");
+        
+        // INSERT-ONLY Pattern: Set audit fields for DELETE operation
+        deleteVersion = mapper.fillAuditFieldsForDelete(deleteVersion);
+        
+        // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
+        productDetailsRepository.save(deleteVersion);
     }
 
     // Removed validateRateMatrixEntry method as it's no longer needed with the simplified DTO structure

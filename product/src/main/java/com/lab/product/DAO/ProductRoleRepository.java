@@ -5,16 +5,62 @@ import com.lab.product.entity.PRODUCT_DETAILS;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ProductRoleRepository extends JpaRepository<PRODUCT_ROLE, UUID> {
-    Page<PRODUCT_ROLE> findByProduct(PRODUCT_DETAILS product, Pageable pageable);
-    Optional<PRODUCT_ROLE> findByProductAndRoleId(PRODUCT_DETAILS product, UUID roleId);
-    Optional<PRODUCT_ROLE> findByProductAndRoleCode(PRODUCT_DETAILS product, String roleCode);
-    boolean existsByProductAndRoleId(PRODUCT_DETAILS product, UUID roleId);
-    boolean existsByProductAndRoleCode(PRODUCT_DETAILS product, String roleCode);
+    
+    // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
+    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.productCode = :productCode " +
+           "AND r.crud_value != 'D' " +
+           "ORDER BY r.createdAt DESC")
+    List<PRODUCT_ROLE> findByProductCode(@Param("productCode") String productCode);
+    
+    // INSERT-ONLY Pattern: Find all versions for audit trail
+    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.productCode = :productCode " +
+           "ORDER BY r.createdAt DESC")
+    List<PRODUCT_ROLE> findAllVersionsByProductCode(@Param("productCode") String productCode);
+    
+    // INSERT-ONLY Pattern: Find specific role by productCode and roleCode
+    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.productCode = :productCode " +
+           "AND r.roleCode = :roleCode " +
+           "AND r.crud_value != 'D' " +
+           "ORDER BY r.createdAt DESC")
+    Optional<PRODUCT_ROLE> findByProductCodeAndRoleCode(@Param("productCode") String productCode, 
+                                                         @Param("roleCode") String roleCode);
+    
+    // Legacy methods - maintained for backward compatibility
+    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
+           "AND r.crud_value != 'D'")
+    Page<PRODUCT_ROLE> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
+    
+    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
+           "AND r.roleId = :roleId " +
+           "AND r.crud_value != 'D' " +
+           "ORDER BY r.createdAt DESC")
+    Optional<PRODUCT_ROLE> findByProductAndRoleId(@Param("product") PRODUCT_DETAILS product, 
+                                                   @Param("roleId") UUID roleId);
+    
+    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
+           "AND r.roleCode = :roleCode " +
+           "AND r.crud_value != 'D' " +
+           "ORDER BY r.createdAt DESC")
+    Optional<PRODUCT_ROLE> findByProductAndRoleCode(@Param("product") PRODUCT_DETAILS product, 
+                                                     @Param("roleCode") String roleCode);
+    
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM PRODUCT_ROLE r " +
+           "WHERE r.product = :product AND r.roleId = :roleId AND r.crud_value != 'D'")
+    boolean existsByProductAndRoleId(@Param("product") PRODUCT_DETAILS product, 
+                                     @Param("roleId") UUID roleId);
+    
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END FROM PRODUCT_ROLE r " +
+           "WHERE r.product = :product AND r.roleCode = :roleCode AND r.crud_value != 'D'")
+    boolean existsByProductAndRoleCode(@Param("product") PRODUCT_DETAILS product, 
+                                       @Param("roleCode") String roleCode);
 }

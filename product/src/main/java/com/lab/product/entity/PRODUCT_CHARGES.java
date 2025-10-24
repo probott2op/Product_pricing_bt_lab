@@ -22,6 +22,10 @@ public class PRODUCT_CHARGES extends AuditLoggable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private PRODUCT_DETAILS product;
+    
+    // INSERT-ONLY Pattern: Business identifier for linking across versions
+    @Column(name = "PRODUCT_CODE", nullable = false, length = 50)
+    private String productCode;
 
     @Column(nullable = false, length = 100)
     private String chargeCode;

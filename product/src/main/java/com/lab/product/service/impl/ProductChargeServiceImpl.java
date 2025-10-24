@@ -10,6 +10,7 @@ import com.lab.product.DAO.ProductDetailsRepository;
 import com.lab.product.service.ProductChargeService;
 import com.lab.product.service.helper.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,11 +27,14 @@ public class ProductChargeServiceImpl implements ProductChargeService {
     @Override
     @Transactional
     public ProductChargeDTO addChargeToProduct(String productCode, ProductChargeRequestDTO chargeDto) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+        // INSERT-ONLY Pattern: Find latest version of product
+        PRODUCT_DETAILS product = productRepository.findLatestByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
         PRODUCT_CHARGES charge = new PRODUCT_CHARGES();
         charge.setProduct(product);
+        // INSERT-ONLY Pattern: Set productCode for cross-version linking
+        charge.setProductCode(productCode);
         charge.setChargeType(chargeDto.getChargeType());
         charge.setChargeName(chargeDto.getChargeName());
         charge.setChargeCode(chargeDto.getChargeCode());
@@ -39,8 +43,8 @@ public class ProductChargeServiceImpl implements ProductChargeService {
         charge.setFrequency(chargeDto.getFrequency());
         charge.setDebitCredit(chargeDto.getDebitCredit());
         
-        // Fill audit fields
-        mapper.fillAuditFields(charge);
+        // INSERT-ONLY Pattern: Fill audit fields for CREATE operation
+        mapper.fillAuditFieldsForCreate(charge);
         
         PRODUCT_CHARGES saved = chargeRepository.save(charge);
         return mapper.toChargeDto(saved);
@@ -48,7 +52,8 @@ public class ProductChargeServiceImpl implements ProductChargeService {
 
     @Override
     public Page<ProductChargeDTO> getChargesForProduct(String productCode, Pageable pageable) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+        // INSERT-ONLY Pattern: Find latest version of product
+        PRODUCT_DETAILS product = productRepository.findLatestByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
             
         return chargeRepository.findByProduct(product, pageable)
@@ -57,10 +62,8 @@ public class ProductChargeServiceImpl implements ProductChargeService {
 
     @Override
     public ProductChargeDTO getChargeByCode(String productCode, String chargeCode) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
-        
-        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeCode(product, chargeCode)
+        // INSERT-ONLY Pattern: Use productCode-based query to get latest version
+        PRODUCT_CHARGES charge = chargeRepository.findByProductCodeAndChargeCode(productCode, chargeCode)
             .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeCode));
             
         return mapper.toChargeDto(charge);
@@ -69,35 +72,47 @@ public class ProductChargeServiceImpl implements ProductChargeService {
     @Override
     @Transactional
     public ProductChargeDTO updateCharge(String productCode, String chargeCode, ProductChargeRequestDTO chargeDto) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
-
-        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeCode(product, chargeCode)
+        // INSERT-ONLY Pattern: Find existing charge by productCode and chargeCode
+        PRODUCT_CHARGES existing = chargeRepository.findByProductCodeAndChargeCode(productCode, chargeCode)
             .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeCode));
 
-        charge.setChargeType(chargeDto.getChargeType());
-        charge.setChargeCode(chargeDto.getChargeCode());
-        charge.setChargeValue(chargeDto.getChargeValue());
-        charge.setCalculationType(chargeDto.getCalculationType());
-        charge.setFrequency(chargeDto.getFrequency());
-        charge.setDebitCredit(chargeDto.getDebitCredit());
+        // INSERT-ONLY Pattern: Create NEW object instead of modifying existing
+        PRODUCT_CHARGES newVersion = new PRODUCT_CHARGES();
+        // Copy all fields from existing (excluding chargeId and versionTimestamp)
+        BeanUtils.copyProperties(existing, newVersion, "chargeId");
+
+        // Apply updates from DTO
+        newVersion.setChargeType(chargeDto.getChargeType());
+        newVersion.setChargeCode(chargeDto.getChargeCode());
+        newVersion.setChargeValue(chargeDto.getChargeValue());
+        newVersion.setCalculationType(chargeDto.getCalculationType());
+        newVersion.setFrequency(chargeDto.getFrequency());
+        newVersion.setDebitCredit(chargeDto.getDebitCredit());
         
-        // Update audit fields
-        mapper.fillAuditFields(charge);
+        // INSERT-ONLY Pattern: Fill audit fields for UPDATE operation
+        mapper.fillAuditFieldsForUpdate(newVersion);
         
-        PRODUCT_CHARGES updated = chargeRepository.save(charge);
+        // INSERT-ONLY Pattern: Save creates NEW row with same productCode
+        PRODUCT_CHARGES updated = chargeRepository.save(newVersion);
         return mapper.toChargeDto(updated);
     }
 
     @Override
     @Transactional
     public void deleteCharge(String productCode, String chargeCode) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
-            
-        PRODUCT_CHARGES charge = chargeRepository.findByProductAndChargeCode(product, chargeCode)
+        // INSERT-ONLY Pattern: Find existing charge by productCode and chargeCode
+        PRODUCT_CHARGES existing = chargeRepository.findByProductCodeAndChargeCode(productCode, chargeCode)
             .orElseThrow(() -> new ResourceNotFoundException("Charge not found: " + chargeCode));
-            
-        chargeRepository.delete(charge);
+        
+        // INSERT-ONLY Pattern: Create NEW object for delete marker (soft delete)
+        PRODUCT_CHARGES deleteVersion = new PRODUCT_CHARGES();
+        // Copy all fields from existing (excluding chargeId and versionTimestamp)
+        BeanUtils.copyProperties(existing, deleteVersion, "chargeId");
+        
+        // INSERT-ONLY Pattern: Fill audit fields for DELETE operation
+        mapper.fillAuditFieldsForDelete(deleteVersion);
+        
+        // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
+        chargeRepository.save(deleteVersion);
     }
 }

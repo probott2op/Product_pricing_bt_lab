@@ -10,6 +10,7 @@ import com.lab.product.DAO.ProductDetailsRepository;
 import com.lab.product.service.ProductInterestService;
 import com.lab.product.service.helper.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,11 +27,14 @@ public class ProductInterestServiceImpl implements ProductInterestService {
     @Override
     @Transactional
     public ProductInterestDTO addInterestToProduct(String productCode, ProductInterestRequestDTO interestDto) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+        // INSERT-ONLY Pattern: Find latest version of product
+        PRODUCT_DETAILS product = productRepository.findLatestByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
 
         PRODUCT_INTEREST interest = new PRODUCT_INTEREST();
         interest.setProduct(product);
+        // INSERT-ONLY Pattern: Set productCode for cross-version linking
+        interest.setProductCode(productCode);
         interest.setRateCode(interestDto.getRateCode());
         interest.setTermInMonths(interestDto.getTermInMonths());
         interest.setRateCumulative(interestDto.getRateCumulative());
@@ -38,8 +42,8 @@ public class ProductInterestServiceImpl implements ProductInterestService {
         interest.setRateNonCumulativeQuarterly(interestDto.getRateNonCumulativeQuarterly());
         interest.setRateNonCumulativeYearly(interestDto.getRateNonCumulativeYearly());
         
-        // Fill audit fields
-        mapper.fillAuditFields(interest);
+        // INSERT-ONLY Pattern: Fill audit fields for CREATE operation
+        mapper.fillAuditFieldsForCreate(interest);
         
         PRODUCT_INTEREST saved = interestRepository.save(interest);
         return mapper.toInterestDto(saved);
@@ -47,7 +51,8 @@ public class ProductInterestServiceImpl implements ProductInterestService {
 
     @Override
     public Page<ProductInterestDTO> getInterestRatesForProduct(String productCode, Pageable pageable) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
+        // INSERT-ONLY Pattern: Find latest version of product
+        PRODUCT_DETAILS product = productRepository.findLatestByProductCode(productCode)
             .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
             
         return interestRepository.findByProduct(product, pageable)
@@ -57,10 +62,8 @@ public class ProductInterestServiceImpl implements ProductInterestService {
     @Override
     @Transactional(readOnly = true)
     public ProductInterestDTO getInterestRateByCode(String productCode, String rateCode) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
-            
-        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateCode(product, rateCode)
+        // INSERT-ONLY Pattern: Use productCode-based query to get latest version
+        PRODUCT_INTEREST interest = interestRepository.findByProductCodeAndRateCode(productCode, rateCode)
             .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateCode));
             
         return mapper.toInterestDto(interest);
@@ -69,35 +72,47 @@ public class ProductInterestServiceImpl implements ProductInterestService {
     @Override
     @Transactional
     public ProductInterestDTO updateInterestRate(String productCode, String rateCode, ProductInterestRequestDTO interestDto) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
-            
-        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateCode(product, rateCode)
+        // INSERT-ONLY Pattern: Find existing interest rate by productCode and rateCode
+        PRODUCT_INTEREST existing = interestRepository.findByProductCodeAndRateCode(productCode, rateCode)
             .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateCode));
-            
-        interest.setRateCode(interestDto.getRateCode());
-        interest.setTermInMonths(interestDto.getTermInMonths());
-        interest.setRateCumulative(interestDto.getRateCumulative());
-        interest.setRateNonCumulativeMonthly(interestDto.getRateNonCumulativeMonthly());
-        interest.setRateNonCumulativeQuarterly(interestDto.getRateNonCumulativeQuarterly());
-        interest.setRateNonCumulativeYearly(interestDto.getRateNonCumulativeYearly());
         
-        // Update audit fields
-        mapper.fillAuditFields(interest);
+        // INSERT-ONLY Pattern: Create NEW object instead of modifying existing
+        PRODUCT_INTEREST newVersion = new PRODUCT_INTEREST();
+        // Copy all fields from existing (excluding rateId and versionTimestamp)
+        BeanUtils.copyProperties(existing, newVersion, "rateId");
         
-        PRODUCT_INTEREST updated = interestRepository.save(interest);
+        // Apply updates from DTO
+        newVersion.setRateCode(interestDto.getRateCode());
+        newVersion.setTermInMonths(interestDto.getTermInMonths());
+        newVersion.setRateCumulative(interestDto.getRateCumulative());
+        newVersion.setRateNonCumulativeMonthly(interestDto.getRateNonCumulativeMonthly());
+        newVersion.setRateNonCumulativeQuarterly(interestDto.getRateNonCumulativeQuarterly());
+        newVersion.setRateNonCumulativeYearly(interestDto.getRateNonCumulativeYearly());
+        
+        // INSERT-ONLY Pattern: Fill audit fields for UPDATE operation
+        mapper.fillAuditFieldsForUpdate(newVersion);
+        
+        // INSERT-ONLY Pattern: Save creates NEW row with same productCode
+        PRODUCT_INTEREST updated = interestRepository.save(newVersion);
         return mapper.toInterestDto(updated);
     }
 
     @Override
     @Transactional
     public void deleteInterestRate(String productCode, String rateCode) {
-        PRODUCT_DETAILS product = productRepository.findByProductCode(productCode)
-            .orElseThrow(() -> new ResourceNotFoundException("Product not found: " + productCode));
-        
-        PRODUCT_INTEREST interest = interestRepository.findByProductAndRateCode(product, rateCode)
+        // INSERT-ONLY Pattern: Find existing interest rate by productCode and rateCode
+        PRODUCT_INTEREST existing = interestRepository.findByProductCodeAndRateCode(productCode, rateCode)
             .orElseThrow(() -> new ResourceNotFoundException("Interest rate not found: " + rateCode));
-            
-        interestRepository.delete(interest);
+        
+        // INSERT-ONLY Pattern: Create NEW object for delete marker (soft delete)
+        PRODUCT_INTEREST deleteVersion = new PRODUCT_INTEREST();
+        // Copy all fields from existing (excluding rateId and versionTimestamp)
+        BeanUtils.copyProperties(existing, deleteVersion, "rateId");
+        
+        // INSERT-ONLY Pattern: Fill audit fields for DELETE operation
+        mapper.fillAuditFieldsForDelete(deleteVersion);
+        
+        // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
+        interestRepository.save(deleteVersion);
     }
 }
