@@ -83,10 +83,10 @@ All endpoints require authentication. Contact your system administrator for acce
 - `DELETE /api/products/{productCode}/charges/{chargeCode}` - Delete charge
 
 #### Key Features:
-- **Charge Types**: FIXED amount or PERCENTAGE-based
-- **Calculation Methods**: Various calculation approaches
+- **Charge Types**: FEE, PENALTY, SERVICE_CHARGE
+- **Calculation Methods**: FLAT, PERCENTAGE
 - **Frequency**: ONE_TIME, MONTHLY, QUARTERLY, ANNUALLY
-- **Debit/Credit Indicators**: Define charge direction
+- **Debit/Credit Indicators**: DEBIT or CREDIT
 - **Service Charges**: Account maintenance fees, transaction fees, penalty charges
 
 #### Common Charges:
@@ -96,6 +96,33 @@ All endpoints require authentication. Contact your system administrator for acce
 - Overdraft charges
 - Late payment penalties
 - Processing fees
+
+#### Example - POST Request:
+```json
+{
+  "chargeCode": "FEE001",
+  "chargeName": "Maintenance fee",
+  "chargeType": "FEE",
+  "calculationType": "FLAT",
+  "frequency": "QUARTERLY",
+  "amount": 200,
+  "debitCredit": "DEBIT"
+}
+```
+
+#### Example - GET Response:
+```json
+{
+  "chargeId": "31435394-2af5-4118-9cc7-4616df6a64ee",
+  "chargeCode": "FEE001",
+  "chargeName": "Maintenance fee",
+  "chargeType": "FEE",
+  "calculationType": "FLAT",
+  "frequency": "QUARTERLY",
+  "amount": 200,
+  "debitCredit": "DEBIT"
+}
+```
 
 ---
 
@@ -161,8 +188,8 @@ All endpoints require authentication. Contact your system administrator for acce
 - `DELETE /api/products/{productCode}/transactions/{transactionCode}` - Delete transaction type
 
 #### Key Features:
-- **Transaction Types**: DEPOSIT, WITHDRAWAL, TRANSFER, PAYMENT, etc.
-- **Transaction Limits**: Minimum/maximum amounts, daily limits
+- **Transaction Types**: DEPOSIT, WITHDRAWAL, TRANSFER, PAYMENT, INTEREST_ACCRUED, etc.
+- **Transaction Control**: Enable/disable specific transaction types (isAllowed)
 - **Channel Availability**: ATM, ONLINE, BRANCH, MOBILE
 - **Frequency Restrictions**: Daily transaction count limits
 - **Processing Rules**: Define transaction behavior
@@ -172,6 +199,25 @@ All endpoints require authentication. Contact your system administrator for acce
 - Set transaction limits by channel
 - Configure fraud prevention rules
 - Manage channel-specific restrictions
+
+#### Example - POST Request:
+```json
+{
+  "transactionCode": "FD_DEPOSIT",
+  "transactionType": "DEPOSIT",
+  "isAllowed": true
+}
+```
+
+#### Example - GET Response:
+```json
+{
+  "transactionId": "3e6dcd5d-1615-4e93-8cd3-dc9a2bf8713f",
+  "transactionCode": "FD_DEPOSIT",
+  "transactionType": "DEPOSIT",
+  "isAllowed": true
+}
+```
 
 ---
 
@@ -186,10 +232,11 @@ All endpoints require authentication. Contact your system administrator for acce
 - `DELETE /api/products/{productCode}/communications/{commCode}` - Delete template
 
 #### Key Features:
-- **Communication Channels**: EMAIL, SMS, PUSH_NOTIFICATION, IN_APP, POSTAL_MAIL
-- **Communication Types**: TRANSACTIONAL, PROMOTIONAL, REGULATORY, STATEMENT
+- **Communication Channels**: EMAIL, SMS, PUSH_NOTIFICATION, IN_APP, POST
+- **Communication Types**: ALERT, NOTICE, STATEMENT, NOTIFICATION
 - **Event Triggers**: ACCOUNT_OPENING, TRANSACTION_ALERT, STATEMENT_GENERATION, PAYMENT_DUE
-- **Template Management**: Content templates for various events
+- **Template Management**: Content templates for various events with placeholders
+- **Frequency Control**: Limit communication frequency (frequencyLimit)
 - **Multi-channel Support**: Send via multiple channels simultaneously
 
 #### Common Templates:
@@ -200,10 +247,35 @@ All endpoints require authentication. Contact your system administrator for acce
 - Promotional offers
 - Regulatory notices
 
+#### Example - POST Request:
+```json
+{
+  "commCode": "COMM_OPENING",
+  "communicationType": "ALERT",
+  "channel": "SMS",
+  "event": "COMM_OPENING",
+  "template": "Dear ${CUSTOMER_NAME}, welcome! Your new ${PRODUCT_NAME} account (${ACCOUNT_NUMBER}) was successfully opened on ${DATE}. If you did not authorize this account opening, contact us immediately.",
+  "frequencyLimit": 0
+}
+```
+
+#### Example - GET Response:
+```json
+{
+  "commId": "e1946a5c-1979-4dfa-a721-302e7a89bc07",
+  "commCode": "COMM_OPENING",
+  "communicationType": "ALERT",
+  "channel": "SMS",
+  "event": "COMM_OPENING",
+  "template": "Dear ${CUSTOMER_NAME}, welcome! Your new ${PRODUCT_NAME} account (${ACCOUNT_NUMBER}) was successfully opened on ${DATE}. If you did not authorize this account opening, contact us immediately.",
+  "frequencyLimit": 0
+}
+```
+
 ---
 
 ### 8. **Product Roles & Permissions** (`/api/products/{productCode}/roles`)
-**Purpose**: Role-based access control
+**Purpose**: Role-based access control for product accounts
 
 #### Endpoints:
 - `POST /api/products/{productCode}/roles` - Add role
@@ -213,17 +285,41 @@ All endpoints require authentication. Contact your system administrator for acce
 - `DELETE /api/products/{productCode}/roles/{roleCode}` - Delete role
 
 #### Key Features:
-- **User Types**: CUSTOMER, BRANCH_MANAGER, RELATIONSHIP_OFFICER, ADMIN
+- **Role Types**: OWNER, JOINT_HOLDER, NOMINEE, AUTHORIZED_SIGNATORY, GUARDIAN
+- **Mandatory Roles**: Specify if role is required (isMandatory)
+- **Role Limits**: Define maximum number allowed (maxCount)
 - **Maker-Checker Workflows**: Define approval requirements
 - **Access Levels**: Configure operation permissions
-- **Approval Workflows**: Multi-level authorization
 - **Audit Compliance**: Track who can perform what operations
 
 #### Common Roles:
-- Customer self-service operations
-- Branch staff operations
-- Manager approval requirements
-- Admin configuration access
+- Primary account owner (mandatory, maxCount: 1)
+- Joint account holders (optional, maxCount: multiple)
+- Nominees (optional)
+- Authorized signatories
+- Guardians for minor accounts
+
+#### Example - POST Request:
+```json
+{
+  "roleCode": "ROLE001",
+  "roleType": "OWNER",
+  "isMandatory": true,
+  "maxCount": 1
+}
+```
+
+#### Example - GET Response:
+```json
+{
+  "roleId": "f1097ab9-789c-4bf2-984a-eaa6d42b1fed",
+  "roleCode": "ROLE001",
+  "roleType": "OWNER",
+  "roleName": "OWNER",
+  "isMandatory": true,
+  "maxCount": 1
+}
+```
 
 ---
 
@@ -378,11 +474,52 @@ Content-Type: application/json
 
 {
   "chargeCode": "MAINT_FEE",
-  "chargeType": "FIXED",
-  "chargeValue": 10.00,
+  "chargeName": "Monthly Maintenance Fee",
+  "chargeType": "FEE",
+  "calculationType": "FLAT",
   "frequency": "MONTHLY",
-  "debitCredit": "DEBIT",
-  "calculationType": "FLAT_AMOUNT"
+  "amount": 10.00,
+  "debitCredit": "DEBIT"
+}
+```
+
+### Add Communication Template
+```http
+POST /api/products/SAV001/communications
+Content-Type: application/json
+
+{
+  "commCode": "COMM_WELCOME",
+  "communicationType": "ALERT",
+  "channel": "EMAIL",
+  "event": "ACCOUNT_OPENING",
+  "template": "Welcome ${CUSTOMER_NAME}! Your ${PRODUCT_NAME} account is now active.",
+  "frequencyLimit": 1
+}
+```
+
+### Add Transaction Type
+```http
+POST /api/products/SAV001/transactions
+Content-Type: application/json
+
+{
+  "transactionCode": "ATM_WITHDRAWAL",
+  "transactionType": "WITHDRAWAL",
+  "isAllowed": true
+}
+```
+
+### Add Role Configuration
+```http
+POST /api/products/SAV001/roles
+Content-Type: application/json
+
+{
+  "roleCode": "PRIMARY_OWNER",
+  "roleType": "OWNER",
+  "isMandatory": true,
+  "maxCount": 1
 }
 ```
 

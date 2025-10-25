@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products/{productCode}/balances")
 @RequiredArgsConstructor
@@ -809,5 +811,31 @@ public class ProductBalanceController {
             @PathVariable String balanceType) {
         productBalanceService.deleteBalance(productCode, balanceType);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of all balances for a product",
+        description = "Retrieve ALL versions of ALL balance type configurations for audit purposes.",
+        tags = {"Product Balance Types"}
+    )
+    public ResponseEntity<List<ProductBalanceDTO>> getBalancesAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productBalanceService.getBalancesAuditTrail(productCode));
+    }
+
+    @GetMapping("/{balanceType}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a specific balance type",
+        description = "Retrieve ALL versions of a specific balance type configuration for audit purposes.",
+        tags = {"Product Balance Types"}
+    )
+    public ResponseEntity<List<ProductBalanceDTO>> getBalanceAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode,
+            @Parameter(description = "Balance type", required = true)
+            @PathVariable String balanceType) {
+        return ResponseEntity.ok(productBalanceService.getBalanceAuditTrail(productCode, balanceType));
     }
 }

@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductTransactionServiceImpl implements ProductTransactionService {
@@ -108,5 +111,27 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
         
         // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
         transactionRepository.save(deleteVersion);
+    }
+
+    @Override
+    public List<ProductTransactionDTO> getTransactionsAuditTrail(String productCode) {
+        List<PRODUCT_TRANSACTION> allVersions = transactionRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("No transactions found for product: " + productCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toTransactionDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductTransactionDTO> getTransactionAuditTrail(String productCode, String transactionCode) {
+        List<PRODUCT_TRANSACTION> allVersions = transactionRepository.findAllVersionsByProductCodeAndTransactionCode(productCode, transactionCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Transaction not found: " + transactionCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toTransactionDto)
+                .collect(Collectors.toList());
     }
 }

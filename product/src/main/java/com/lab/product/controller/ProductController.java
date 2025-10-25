@@ -1554,4 +1554,60 @@ public class ProductController {
             @RequestParam(required = false) String endDate) {
         return ResponseEntity.ok(productService.searchProducts(productType, status, startDate, endDate));
     }
+
+    @GetMapping("/{productCode}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a product",
+        description = """
+            Retrieve ALL versions of a product, including deleted and updated versions.
+            This endpoint is designed for audit purposes and compliance tracking.
+            
+            **What it returns:**
+            - All versions of the product configuration
+            - Includes records with crud_value = 'C', 'U', and 'D'
+            - Ordered by creation date (newest first)
+            - Complete history from creation to current state
+            
+            **Use Cases:**
+            
+            **Scenario 1: Compliance Audit**
+            - Track all product configuration changes
+            - Verify who made changes and when
+            - Ensure regulatory compliance
+            
+            **Scenario 2: Change History Analysis**
+            - Review product evolution over time
+            - Identify change patterns
+            - Analyze configuration decisions
+            
+            **Scenario 3: Rollback Investigation**
+            - Determine previous product states
+            - Identify when changes occurred
+            - Support rollback decisions
+            """,
+        tags = {"Product Management"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Audit trail retrieved successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = List.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Product not found"
+        )
+    })
+    public ResponseEntity<List<ProductDetailsDTO>> getProductAuditTrail(
+            @Parameter(
+                description = "Product code to retrieve audit trail for",
+                required = true,
+                example = "FD001"
+            )
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productService.getProductAuditTrail(productCode));
+    }
 }

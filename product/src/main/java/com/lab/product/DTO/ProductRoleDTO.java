@@ -11,4 +11,6 @@ public class ProductRoleDTO {
     private String roleCode;
     private PRODUCT_ROLE_TYPE roleType;
     private String roleName;
+    private boolean isMandatory;
+    private int maxCount;
 }

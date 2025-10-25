@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products/{productCode}/transactions")
 @RequiredArgsConstructor
@@ -957,5 +959,31 @@ public class ProductTransactionController {
             @PathVariable String transactionCode) {
         productTransactionService.deleteTransaction(productCode, transactionCode);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of all transactions for a product",
+        description = "Retrieve ALL versions of ALL transaction configurations for audit purposes.",
+        tags = {"Product Transaction Configuration"}
+    )
+    public ResponseEntity<List<ProductTransactionDTO>> getTransactionsAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productTransactionService.getTransactionsAuditTrail(productCode));
+    }
+
+    @GetMapping("/{transactionCode}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a specific transaction",
+        description = "Retrieve ALL versions of a specific transaction configuration for audit purposes.",
+        tags = {"Product Transaction Configuration"}
+    )
+    public ResponseEntity<List<ProductTransactionDTO>> getTransactionAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode,
+            @Parameter(description = "Transaction code", required = true)
+            @PathVariable String transactionCode) {
+        return ResponseEntity.ok(productTransactionService.getTransactionAuditTrail(productCode, transactionCode));
     }
 }

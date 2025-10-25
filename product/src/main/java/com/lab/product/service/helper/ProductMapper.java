@@ -1,19 +1,29 @@
 package com.lab.product.service.helper;
 
+import com.lab.product.DAO.*;
 import com.lab.product.DTO.*;
 import com.lab.product.entity.*;
 import com.lab.product.entity.ENUMS.CRUD_VALUE;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ProductMapper {
+    
+    private final ProductInterestRepository interestRepository;
+    private final ProductChargeRepository chargeRepository;
+    private final ProductCommunicationRepository communicationRepository;
+    private final ProductTransactionRepository transactionRepository;
+    private final ProductRoleRepository roleRepository;
+    private final ProductBalanceRepository balanceRepository;
+    private final ProductRulesRepository rulesRepository;
 
     public ProductBalanceDTO toBalanceDto(PRODUCT_BALANCE balance) {
         if (balance == null) return null;
@@ -29,11 +39,13 @@ public class ProductMapper {
         if (charge == null) return null;
         ProductChargeDTO dto = new ProductChargeDTO();
         dto.setChargeId(charge.getChargeId());
-        dto.setChargeType(charge.getChargeType());
         dto.setChargeCode(charge.getChargeCode());
-        dto.setAmount(charge.getChargeValue());
+        dto.setChargeName(charge.getChargeName());
+        dto.setChargeType(charge.getChargeType());
         dto.setCalculationType(charge.getCalculationType());
         dto.setFrequency(charge.getFrequency());
+        dto.setAmount(charge.getChargeValue());
+        dto.setDebitCredit(charge.getDebitCredit());
         return dto;
     }
     
@@ -44,6 +56,8 @@ public class ProductMapper {
         dto.setRoleCode(role.getRoleCode());
         dto.setRoleType(role.getRoleType());
         dto.setRoleName(role.getRoleType() != null ? role.getRoleType().name() : null);
+        dto.setMandatory(role.isMandatory());
+        dto.setMaxCount(role.getMaxCount());
         return dto;
     }
     
@@ -66,7 +80,7 @@ public class ProductMapper {
         dto.setTransactionId(transaction.getId());
         dto.setTransactionCode(transaction.getTransactionCode());
         dto.setTransactionType(transaction.getTransactionType());
-        dto.setAmountLimit(null); // Set to null or a default value as entity doesn't have this field
+        dto.setAllowed(transaction.isAllowed());
         return dto;
     }
     
@@ -79,6 +93,7 @@ public class ProductMapper {
         dto.setChannel(communication.getChannel());
         dto.setEvent(communication.getEvent());
         dto.setTemplate(communication.getTemplate());
+        dto.setFrequencyLimit(communication.getFrequencyLimit());
         return dto;
     }
     
@@ -183,9 +198,14 @@ public class ProductMapper {
         dto.setStatus(product.getStatus());
         dto.setInterestType(product.getInterestType());
         dto.setCompoundingFrequency(product.getCompoundingFrequency());
-        // rules
-        if (product.getProductRules() != null) {
-            dto.setProductRules(product.getProductRules().stream().map(r -> {
+        
+        // INSERT-ONLY Pattern: Fetch only latest versions using repositories
+        String productCode = product.getProductCode();
+        
+        // rules - fetch latest versions by productCode
+        List<PRODUCT_RULES> latestRules = rulesRepository.findByProductCode(productCode);
+        if (latestRules != null && !latestRules.isEmpty()) {
+            dto.setProductRules(latestRules.stream().map(r -> {
                 ProductRuleDTO rd = new ProductRuleDTO();
                 rd.setRuleId(r.getRuleId());
                 rd.setRuleCode(r.getRuleCode());
@@ -198,45 +218,55 @@ public class ProductMapper {
             }).collect(Collectors.toList()));
         }
 
-        // charges
-        if (product.getProductCharges() != null) {
-            dto.setProductCharges(product.getProductCharges().stream().map(c -> {
+        // charges - fetch latest versions by productCode
+        List<PRODUCT_CHARGES> latestCharges = chargeRepository.findByProductCode(productCode);
+        if (latestCharges != null && !latestCharges.isEmpty()) {
+            dto.setProductCharges(latestCharges.stream().map(c -> {
                 ProductChargeDTO cd = new ProductChargeDTO();
                 cd.setChargeId(c.getChargeId());
                 cd.setChargeCode(c.getChargeCode());
+                cd.setChargeName(c.getChargeName());
                 cd.setChargeType(c.getChargeType());
                 cd.setCalculationType(c.getCalculationType());
                 cd.setFrequency(c.getFrequency());
                 cd.setAmount(c.getChargeValue());
+                cd.setDebitCredit(c.getDebitCredit());
                 return cd;
             }).collect(Collectors.toList()));
         }
 
-        // roles
-        if (product.getProductRoles() != null) {
-            dto.setProductRoles(product.getProductRoles().stream().map(r -> {
+        // roles - fetch latest versions by productCode
+        List<PRODUCT_ROLE> latestRoles = roleRepository.findByProductCode(productCode);
+        if (latestRoles != null && !latestRoles.isEmpty()) {
+            dto.setProductRoles(latestRoles.stream().map(r -> {
                 ProductRoleDTO pr = new ProductRoleDTO();
                 pr.setRoleId(r.getRoleId());
                 pr.setRoleCode(r.getRoleCode());
                 pr.setRoleType(r.getRoleType());
                 pr.setRoleName(r.getRoleType() != null ? r.getRoleType().name() : null);
+                pr.setMandatory(r.isMandatory());
+                pr.setMaxCount(r.getMaxCount());
                 return pr;
             }).collect(Collectors.toList()));
         }
 
-        // transactions
-        if (product.getProductTransactions() != null) {
-            dto.setProductTransactions(product.getProductTransactions().stream().map(t -> {
+        // transactions - fetch latest versions by productCode
+        List<PRODUCT_TRANSACTION> latestTransactions = transactionRepository.findByProductCode(productCode);
+        if (latestTransactions != null && !latestTransactions.isEmpty()) {
+            dto.setProductTransactions(latestTransactions.stream().map(t -> {
                 ProductTransactionDTO pt = new ProductTransactionDTO();
                 pt.setTransactionId(t.getId());
                 pt.setTransactionCode(t.getTransactionCode());
                 pt.setTransactionType(t.getTransactionType());
-                pt.setAmountLimit(null);
+                pt.setAllowed(t.isAllowed());
                 return pt;
             }).collect(Collectors.toList()));
-        // Interests
-        if (product.getProductInterest() != null) {
-            dto.setProductInterests(product.getProductInterest().stream().map(t -> {
+        }
+        
+        // Interests - fetch latest versions by productCode
+        List<PRODUCT_INTEREST> latestInterests = interestRepository.findByProductCode(productCode);
+        if (latestInterests != null && !latestInterests.isEmpty()) {
+            dto.setProductInterests(latestInterests.stream().map(t -> {
                 ProductInterestDTO pi = new ProductInterestDTO();
                 pi.setRateId(t.getRateId());
                 pi.setRateCode(t.getRateCode());
@@ -246,21 +276,21 @@ public class ProductMapper {
                 pi.setRateNonCumulativeQuarterly(t.getRateNonCumulativeQuarterly());
                 pi.setRateNonCumulativeYearly(t.getRateNonCumulativeYearly());
                 return pi;
-
             }).collect(Collectors.toList()));
         }
-        }
 
-        // balances - ledger schema components
-        if (product.getProductBalances() != null) {
-            dto.setProductBalances(product.getProductBalances().stream()
+        // balances - fetch latest versions by productCode
+        List<PRODUCT_BALANCE> latestBalances = balanceRepository.findByProductCode(productCode);
+        if (latestBalances != null && !latestBalances.isEmpty()) {
+            dto.setProductBalances(latestBalances.stream()
                 .map(this::toBalanceDto)
                 .collect(Collectors.toList()));
         }
 
-        // communications
-        if (product.getProductCommunications() != null) {
-            dto.setProductCommunications(product.getProductCommunications().stream().map(c -> {
+        // communications - fetch latest versions by productCode
+        List<PRODUCT_COMMUNICATION> latestComms = communicationRepository.findByProductCode(productCode);
+        if (latestComms != null && !latestComms.isEmpty()) {
+            dto.setProductCommunications(latestComms.stream().map(c -> {
                 ProductCommunicationDTO pc = new ProductCommunicationDTO();
                 pc.setCommId(c.getCommId());
                 pc.setCommCode(c.getCommCode());
@@ -268,6 +298,7 @@ public class ProductMapper {
                 pc.setChannel(c.getChannel());
                 pc.setEvent(c.getEvent());
                 pc.setTemplate(c.getTemplate());
+                pc.setFrequencyLimit(c.getFrequencyLimit());
                 return pc;
             }).collect(Collectors.toList()));
         }

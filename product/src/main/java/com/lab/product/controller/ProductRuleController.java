@@ -1028,4 +1028,30 @@ public class ProductRuleController {
         productRuleService.deleteRule(productCode, ruleId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of all rules for a product",
+        description = "Retrieve ALL versions of ALL business rules for audit purposes.",
+        tags = {"Product Business Rules"}
+    )
+    public ResponseEntity<List<ProductRuleDTO>> getRulesAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productRuleService.getRulesAuditTrail(productCode));
+    }
+
+    @GetMapping("/{ruleCode}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a specific rule",
+        description = "Retrieve ALL versions of a specific business rule for audit purposes.",
+        tags = {"Product Business Rules"}
+    )
+    public ResponseEntity<List<ProductRuleDTO>> getRuleAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode,
+            @Parameter(description = "Rule code", required = true)
+            @PathVariable String ruleCode) {
+        return ResponseEntity.ok(productRuleService.getRuleAuditTrail(productCode, ruleCode));
+    }
 }

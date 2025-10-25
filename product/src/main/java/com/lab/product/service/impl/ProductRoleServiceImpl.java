@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductRoleServiceImpl implements ProductRoleService {
@@ -111,5 +114,27 @@ public class ProductRoleServiceImpl implements ProductRoleService {
         
         // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
         roleRepository.save(deleteVersion);
+    }
+
+    @Override
+    public List<ProductRoleDTO> getRolesAuditTrail(String productCode) {
+        List<PRODUCT_ROLE> allVersions = roleRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("No roles found for product: " + productCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toRoleDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductRoleDTO> getRoleAuditTrail(String productCode, String roleCode) {
+        List<PRODUCT_ROLE> allVersions = roleRepository.findAllVersionsByProductCodeAndRoleCode(productCode, roleCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Role not found: " + roleCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toRoleDto)
+                .collect(Collectors.toList());
     }
 }

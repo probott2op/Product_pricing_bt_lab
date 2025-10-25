@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products/{productCode}/communications")
 @RequiredArgsConstructor
@@ -909,13 +911,13 @@ public class ProductCommunicationController {
             @Parameter(
                 description = "Product code",
                 required = true,
-                example = "SAV-HIGH-YIELD-2025"
+                example = "FD001"
             )
             @PathVariable String productCode,
             @Parameter(
                 description = "Communication template ID (UUID) to update",
                 required = true,
-                example = "comm-991e8400-e29b-41d4-a716-446655440001"
+                example = "COMM_OPENING"
             )
             @PathVariable String commId,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -1114,5 +1116,31 @@ public class ProductCommunicationController {
             @PathVariable String commId) {
         productCommunicationService.deleteCommunication(productCode, commId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of all communications for a product",
+        description = "Retrieve ALL versions of ALL communication templates for audit purposes.",
+        tags = {"Product Communication Templates"}
+    )
+    public ResponseEntity<List<ProductCommunicationDTO>> getCommunicationsAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productCommunicationService.getCommunicationsAuditTrail(productCode));
+    }
+
+    @GetMapping("/{commCode}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a specific communication template",
+        description = "Retrieve ALL versions of a specific communication template for audit purposes.",
+        tags = {"Product Communication Templates"}
+    )
+    public ResponseEntity<List<ProductCommunicationDTO>> getCommunicationAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode,
+            @Parameter(description = "Communication code", required = true)
+            @PathVariable String commCode) {
+        return ResponseEntity.ok(productCommunicationService.getCommunicationAuditTrail(productCode, commCode));
     }
 }

@@ -6,6 +6,9 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -55,7 +58,20 @@ public class OpenApiConfig {
                     "3. Use the 'Try it out' feature to test endpoints\n" +
                     "4. Check example requests and responses for each operation\n\n" +
                     "## Authentication\n" +
-                    "This API requires authentication. Contact your system administrator for access credentials.\n\n" +
+                    "This API uses JWT Bearer token authentication from NEXA Bank Auth Service.\n\n" +
+                    "**How to authenticate:**\n" +
+                    "1. Click the **Authorize** button (🔓) at the top of this page\n" +
+                    "2. Enter your JWT token in the format: `Bearer <your_token>`\n" +
+                    "3. Click **Authorize** to apply the token to all requests\n\n" +
+                    "**To get a JWT token:**\n" +
+                    "```bash\n" +
+                    "curl -X POST http://localhost:3020/api/auth/login \\\n" +
+                    "  -H \"Content-Type: application/json\" \\\n" +
+                    "  -d '{\"email\": \"admin@nexabank.com\", \"password\": \"YourPassword\"}'\n" +
+                    "```\n\n" +
+                    "**Access Rules:**\n" +
+                    "- **GET requests**: Public (no authentication required)\n" +
+                    "- **POST/PUT/DELETE requests**: Require ADMIN role in JWT token\n\n" +
                     "## Support\n" +
                     "For technical support, documentation, or API access requests, contact the Banking Labs support team."
                 )
@@ -83,6 +99,15 @@ public class OpenApiConfig {
             ))
             .externalDocs(new ExternalDocumentation()
                 .description("Complete API Documentation & User Guide")
-                .url("https://docs.bankinglabs.com/product-pricing-api"));
+                .url("https://docs.bankinglabs.com/product-pricing-api"))
+            .components(new Components()
+                .addSecuritySchemes("bearerAuth", new SecurityScheme()
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")
+                    .description("JWT token from NEXA Bank Auth Service. " +
+                        "Format: `Bearer <your_jwt_token>`. " +
+                        "Get token from: http://localhost:3020/api/auth/login")))
+            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
     }
 }

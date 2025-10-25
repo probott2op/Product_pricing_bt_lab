@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products/{productCode}/charges")
 @RequiredArgsConstructor
@@ -453,5 +455,31 @@ public class ProductChargeController {
             @PathVariable String chargeId) {
         productChargeService.deleteCharge(productCode, chargeId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of all charges for a product",
+        description = "Retrieve ALL versions of ALL charges for a product for audit purposes.",
+        tags = {"Product Charges & Fees"}
+    )
+    public ResponseEntity<List<ProductChargeDTO>> getChargesAuditTrail(
+            @Parameter(description = "Product code", required = true, example = "FD001")
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productChargeService.getChargesAuditTrail(productCode));
+    }
+
+    @GetMapping("/{chargeCode}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a specific charge",
+        description = "Retrieve ALL versions of a specific charge for audit purposes.",
+        tags = {"Product Charges & Fees"}
+    )
+    public ResponseEntity<List<ProductChargeDTO>> getChargeAuditTrail(
+            @Parameter(description = "Product code", required = true, example = "FD001")
+            @PathVariable String productCode,
+            @Parameter(description = "Charge code", required = true, example = "FEE001")
+            @PathVariable String chargeCode) {
+        return ResponseEntity.ok(productChargeService.getChargeAuditTrail(productCode, chargeCode));
     }
 }

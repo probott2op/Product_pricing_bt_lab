@@ -16,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductCommunicationServiceImpl implements ProductCommunicationService {
@@ -115,5 +118,27 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
         
         // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
         communicationRepository.save(deleteVersion);
+    }
+
+    @Override
+    public List<ProductCommunicationDTO> getCommunicationsAuditTrail(String productCode) {
+        List<PRODUCT_COMMUNICATION> allVersions = communicationRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("No communications found for product: " + productCode);
+        }
+        return allVersions.stream()
+                .map(productMapper::toCommunicationDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductCommunicationDTO> getCommunicationAuditTrail(String productCode, String commCode) {
+        List<PRODUCT_COMMUNICATION> allVersions = communicationRepository.findAllVersionsByProductCodeAndCommCode(productCode, commCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Communication not found: " + commCode);
+        }
+        return allVersions.stream()
+                .map(productMapper::toCommunicationDto)
+                .collect(Collectors.toList());
     }
 }

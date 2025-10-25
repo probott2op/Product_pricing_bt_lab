@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products/{productCode}/roles")
 @RequiredArgsConstructor
@@ -1004,5 +1006,31 @@ public class ProductRoleController {
             @PathVariable String roleId) {
         productRoleService.deleteRole(productCode, roleId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of all roles for a product",
+        description = "Retrieve ALL versions of ALL role configurations for audit purposes.",
+        tags = {"Product Role Management"}
+    )
+    public ResponseEntity<List<ProductRoleDTO>> getRolesAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productRoleService.getRolesAuditTrail(productCode));
+    }
+
+    @GetMapping("/{roleCode}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a specific role",
+        description = "Retrieve ALL versions of a specific role configuration for audit purposes.",
+        tags = {"Product Role Management"}
+    )
+    public ResponseEntity<List<ProductRoleDTO>> getRoleAuditTrail(
+            @Parameter(description = "Product code", required = true)
+            @PathVariable String productCode,
+            @Parameter(description = "Role code", required = true)
+            @PathVariable String roleCode) {
+        return ResponseEntity.ok(productRoleService.getRoleAuditTrail(productCode, roleCode));
     }
 }

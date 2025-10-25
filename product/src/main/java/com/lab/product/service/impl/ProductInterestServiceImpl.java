@@ -16,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductInterestServiceImpl implements ProductInterestService {
@@ -114,5 +117,27 @@ public class ProductInterestServiceImpl implements ProductInterestService {
         
         // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
         interestRepository.save(deleteVersion);
+    }
+
+    @Override
+    public List<ProductInterestDTO> getInterestRatesAuditTrail(String productCode) {
+        List<PRODUCT_INTEREST> allVersions = interestRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("No interest rates found for product: " + productCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toInterestDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductInterestDTO> getInterestRateAuditTrail(String productCode, String rateCode) {
+        List<PRODUCT_INTEREST> allVersions = interestRepository.findAllVersionsByProductCodeAndRateCode(productCode, rateCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Interest rate not found: " + rateCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toInterestDto)
+                .collect(Collectors.toList());
     }
 }

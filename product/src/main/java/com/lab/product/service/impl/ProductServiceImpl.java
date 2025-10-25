@@ -217,5 +217,16 @@ public class ProductServiceImpl implements ProductService {
         productDetailsRepository.save(deleteVersion);
     }
 
+    @Override
+    public List<ProductDetailsDTO> getProductAuditTrail(String productCode) {
+        List<PRODUCT_DETAILS> allVersions = productDetailsRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Product not found: " + productCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     // Removed validateRateMatrixEntry method as it's no longer needed with the simplified DTO structure
 }

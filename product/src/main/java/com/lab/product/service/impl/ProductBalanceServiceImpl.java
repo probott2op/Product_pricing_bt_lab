@@ -17,6 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductBalanceServiceImpl implements ProductBalanceService {
@@ -115,5 +118,28 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
         
         // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
         balanceRepository.save(deleteVersion);
+    }
+
+    @Override
+    public List<ProductBalanceDTO> getBalancesAuditTrail(String productCode) {
+        List<PRODUCT_BALANCE> allVersions = balanceRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("No balances found for product: " + productCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toBalanceDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductBalanceDTO> getBalanceAuditTrail(String productCode, String balanceType) {
+        List<PRODUCT_BALANCE> allVersions = balanceRepository.findAllVersionsByProductCodeAndBalanceType(
+            productCode, PRODUCT_BALANCE_TYPE.valueOf(balanceType));
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Balance type not found: " + balanceType);
+        }
+        return allVersions.stream()
+                .map(mapper::toBalanceDto)
+                .collect(Collectors.toList());
     }
 }

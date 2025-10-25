@@ -21,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products/{productCode}/interest-rates")
 @RequiredArgsConstructor
@@ -874,5 +876,118 @@ public class ProductInterestController {
             @PathVariable String interestId) {
         productInterestService.deleteInterestRate(productCode, interestId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of all interest rates for a product",
+        description = """
+            Retrieve ALL versions of ALL interest rates for a product, including deleted and updated versions.
+            This endpoint is designed for audit purposes and compliance tracking.
+            
+            **What it returns:**
+            - All versions of all interest rate configurations
+            - Includes records with crud_value = 'C', 'U', and 'D'
+            - Ordered by creation date (newest first)
+            - No pagination - returns complete history
+            
+            **Use Cases:**
+            
+            **Scenario 1: Compliance Audit**
+            - Auditors need complete history of rate changes
+            - Track who changed rates and when
+            - Verify regulatory compliance
+            
+            **Scenario 2: Change Analysis**
+            - Analyze rate change patterns over time
+            - Identify frequency of rate adjustments
+            - Review historical rate decisions
+            
+            **Scenario 3: Rollback Investigation**
+            - Understand what rates were before changes
+            - Identify when incorrect rates were applied
+            - Determine correct rollback point
+            
+            **Response Details:**
+            - Each version is a complete snapshot at that point in time
+            - Multiple versions of same rateCode may exist
+            - crud_value indicates operation: C=Create, U=Update, D=Delete
+            """,
+        tags = {"Product Interest Rates"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Audit trail retrieved successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = List.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Product not found",
+            content = @Content(mediaType = "application/json")
+        )
+    })
+    public ResponseEntity<List<ProductInterestDTO>> getInterestRatesAuditTrail(
+            @Parameter(description = "Product code", required = true, example = "FD001")
+            @PathVariable String productCode) {
+        return ResponseEntity.ok(productInterestService.getInterestRatesAuditTrail(productCode));
+    }
+
+    @GetMapping("/{rateCode}/audit-trail")
+    @Operation(
+        summary = "Get complete audit trail of a specific interest rate",
+        description = """
+            Retrieve ALL versions of a specific interest rate, including deleted and updated versions.
+            This endpoint is designed for detailed audit tracking of a single rate configuration.
+            
+            **What it returns:**
+            - All versions of the specified interest rate
+            - Complete history from creation to deletion
+            - Ordered by creation date (newest first)
+            - Shows exact values at each point in time
+            
+            **Use Cases:**
+            
+            **Scenario 1: Rate Change Investigation**
+            - Track all changes to a specific rate
+            - Identify who made each change
+            - Verify change authorization
+            
+            **Scenario 2: Dispute Resolution**
+            - Prove what rate was active at specific date
+            - Show complete change history
+            - Resolve customer disputes
+            
+            **Scenario 3: Error Analysis**
+            - Identify when incorrect rate was entered
+            - Trace correction history
+            - Prevent similar errors
+            """,
+        tags = {"Product Interest Rates"}
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Audit trail retrieved successfully",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = List.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Product or rate not found",
+            content = @Content(mediaType = "application/json")
+        )
+    })
+    public ResponseEntity<List<ProductInterestDTO>> getInterestRateAuditTrail(
+            @Parameter(description = "Product code", required = true, example = "FD001")
+            @PathVariable String productCode,
+            @Parameter(description = "Interest rate code", required = true, example = "INT12M001")
+            @PathVariable String rateCode) {
+        return ResponseEntity.ok(productInterestService.getInterestRateAuditTrail(productCode, rateCode));
     }
 }

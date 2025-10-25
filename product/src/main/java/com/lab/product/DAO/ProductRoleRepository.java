@@ -19,6 +19,8 @@ public interface ProductRoleRepository extends JpaRepository<PRODUCT_ROLE, UUID>
     // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
     @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.productCode = :productCode " +
            "AND r.crud_value != 'D' " +
+           "AND r.createdAt = (SELECT MAX(r2.createdAt) FROM PRODUCT_ROLE r2 " +
+           "WHERE r2.roleCode = r.roleCode AND r2.productCode = :productCode AND r2.crud_value != 'D') " +
            "ORDER BY r.createdAt DESC")
     List<PRODUCT_ROLE> findByProductCode(@Param("productCode") String productCode);
     
@@ -27,11 +29,18 @@ public interface ProductRoleRepository extends JpaRepository<PRODUCT_ROLE, UUID>
            "ORDER BY r.createdAt DESC")
     List<PRODUCT_ROLE> findAllVersionsByProductCode(@Param("productCode") String productCode);
     
-    // INSERT-ONLY Pattern: Find specific role by productCode and roleCode
+    // INSERT-ONLY Pattern: Find all versions for a specific role code (audit trail)
     @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.productCode = :productCode " +
            "AND r.roleCode = :roleCode " +
-           "AND r.crud_value != 'D' " +
            "ORDER BY r.createdAt DESC")
+    List<PRODUCT_ROLE> findAllVersionsByProductCodeAndRoleCode(@Param("productCode") String productCode, 
+                                                                @Param("roleCode") String roleCode);
+    
+    // INSERT-ONLY Pattern: Find specific role by productCode and roleCode
+    @Query(value = "SELECT r FROM PRODUCT_ROLE r WHERE r.productCode = :productCode " +
+           "AND r.roleCode = :roleCode " +
+           "AND r.crud_value != 'D' " +
+           "ORDER BY r.createdAt DESC LIMIT 1")
     Optional<PRODUCT_ROLE> findByProductCodeAndRoleCode(@Param("productCode") String productCode, 
                                                          @Param("roleCode") String roleCode);
     
@@ -42,17 +51,17 @@ public interface ProductRoleRepository extends JpaRepository<PRODUCT_ROLE, UUID>
            "WHERE r2.roleCode = r.roleCode AND r2.crud_value != 'D')")
     Page<PRODUCT_ROLE> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
-    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
+    @Query(value = "SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
            "AND r.roleId = :roleId " +
            "AND r.crud_value != 'D' " +
-           "ORDER BY r.createdAt DESC")
+           "ORDER BY r.createdAt DESC LIMIT 1")
     Optional<PRODUCT_ROLE> findByProductAndRoleId(@Param("product") PRODUCT_DETAILS product, 
                                                    @Param("roleId") UUID roleId);
     
-    @Query("SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
+    @Query(value = "SELECT r FROM PRODUCT_ROLE r WHERE r.product = :product " +
            "AND r.roleCode = :roleCode " +
            "AND r.crud_value != 'D' " +
-           "ORDER BY r.createdAt DESC")
+           "ORDER BY r.createdAt DESC LIMIT 1")
     Optional<PRODUCT_ROLE> findByProductAndRoleCode(@Param("product") PRODUCT_DETAILS product, 
                                                      @Param("roleCode") String roleCode);
     

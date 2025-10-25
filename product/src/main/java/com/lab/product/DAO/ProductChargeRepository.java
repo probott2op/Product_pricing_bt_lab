@@ -19,6 +19,8 @@ public interface ProductChargeRepository extends JpaRepository<PRODUCT_CHARGES, 
     // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
     @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.productCode = :productCode " +
            "AND c.crud_value != 'D' " +
+           "AND c.createdAt = (SELECT MAX(c2.createdAt) FROM PRODUCT_CHARGES c2 " +
+           "WHERE c2.chargeCode = c.chargeCode AND c2.productCode = :productCode AND c2.crud_value != 'D') " +
            "ORDER BY c.createdAt DESC")
     List<PRODUCT_CHARGES> findByProductCode(@Param("productCode") String productCode);
     
@@ -27,11 +29,18 @@ public interface ProductChargeRepository extends JpaRepository<PRODUCT_CHARGES, 
            "ORDER BY c.createdAt DESC")
     List<PRODUCT_CHARGES> findAllVersionsByProductCode(@Param("productCode") String productCode);
     
-    // INSERT-ONLY Pattern: Find specific charge by productCode and chargeCode
+    // INSERT-ONLY Pattern: Find all versions for a specific charge code (audit trail)
     @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.productCode = :productCode " +
            "AND c.chargeCode = :chargeCode " +
-           "AND c.crud_value != 'D' " +
            "ORDER BY c.createdAt DESC")
+    List<PRODUCT_CHARGES> findAllVersionsByProductCodeAndChargeCode(@Param("productCode") String productCode, 
+                                                                     @Param("chargeCode") String chargeCode);
+    
+    // INSERT-ONLY Pattern: Find specific charge by productCode and chargeCode
+    @Query(value = "SELECT c FROM PRODUCT_CHARGES c WHERE c.productCode = :productCode " +
+           "AND c.chargeCode = :chargeCode " +
+           "AND c.crud_value != 'D' " +
+           "ORDER BY c.createdAt DESC LIMIT 1")
     Optional<PRODUCT_CHARGES> findByProductCodeAndChargeCode(@Param("productCode") String productCode, 
                                                               @Param("chargeCode") String chargeCode);
     
@@ -42,17 +51,17 @@ public interface ProductChargeRepository extends JpaRepository<PRODUCT_CHARGES, 
            "WHERE c2.chargeCode = c.chargeCode AND c2.crud_value != 'D')")
     Page<PRODUCT_CHARGES> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
-    @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
+    @Query(value = "SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
            "AND c.chargeId = :chargeId " +
            "AND c.crud_value != 'D' " +
-           "ORDER BY c.createdAt DESC")
+           "ORDER BY c.createdAt DESC LIMIT 1")
     Optional<PRODUCT_CHARGES> findByProductAndChargeId(@Param("product") PRODUCT_DETAILS product, 
                                                         @Param("chargeId") UUID chargeId);
     
-    @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
+    @Query(value = "SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
            "AND c.chargeCode = :chargeCode " +
            "AND c.crud_value != 'D' " +
-           "ORDER BY c.createdAt DESC")
+           "ORDER BY c.createdAt DESC LIMIT 1")
     Optional<PRODUCT_CHARGES> findByProductAndChargeCode(@Param("product") PRODUCT_DETAILS product, 
                                                           @Param("chargeCode") String chargeCode);
     

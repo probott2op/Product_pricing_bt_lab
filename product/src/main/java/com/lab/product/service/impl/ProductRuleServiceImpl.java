@@ -5,7 +5,7 @@ import com.lab.product.DTO.ProductRuleRequestDTO;
 import com.lab.product.entity.PRODUCT_RULES;
 import com.lab.product.entity.PRODUCT_DETAILS;
 import com.lab.product.Exception.ResourceNotFoundException;
-import com.lab.product.DAO.ProductRuleRepository;
+import com.lab.product.DAO.ProductRulesRepository;
 import com.lab.product.DAO.ProductDetailsRepository;
 import com.lab.product.service.ProductRuleService;
 import com.lab.product.service.helper.ProductMapper;
@@ -16,11 +16,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductRuleServiceImpl implements ProductRuleService {
     
-    private final ProductRuleRepository ruleRepository;
+    private final ProductRulesRepository ruleRepository;
     private final ProductDetailsRepository productRepository;
     private final ProductMapper mapper;
 
@@ -112,5 +115,27 @@ public class ProductRuleServiceImpl implements ProductRuleService {
         
         // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
         ruleRepository.save(deleteVersion);
+    }
+
+    @Override
+    public List<ProductRuleDTO> getRulesAuditTrail(String productCode) {
+        List<PRODUCT_RULES> allVersions = ruleRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("No rules found for product: " + productCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toRuleDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductRuleDTO> getRuleAuditTrail(String productCode, String ruleCode) {
+        List<PRODUCT_RULES> allVersions = ruleRepository.findAllVersionsByProductCodeAndRuleCode(productCode, ruleCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Rule not found: " + ruleCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toRuleDto)
+                .collect(Collectors.toList());
     }
 }

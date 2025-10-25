@@ -5,6 +5,8 @@ import com.lab.product.DTO.ProductInterestRequestDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ProductInterestService {
     /**
      * Add a new interest rate to a product
@@ -30,4 +32,14 @@ public interface ProductInterestService {
      * Delete an interest rate
      */
     void deleteInterestRate(String productCode, String rateCode);
+    
+    /**
+     * Get all versions of interest rates for a product (audit trail)
+     */
+    List<ProductInterestDTO> getInterestRatesAuditTrail(String productCode);
+    
+    /**
+     * Get all versions of a specific interest rate (audit trail)
+     */
+    List<ProductInterestDTO> getInterestRateAuditTrail(String productCode, String rateCode);
 }

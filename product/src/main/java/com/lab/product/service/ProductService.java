@@ -16,4 +16,5 @@ public interface ProductService {
     Page<ProductDetailsDTO> getAllProducts(Pageable pageable);
     void deleteProduct(String productCode);
     List<ProductDetailsDTO> searchProducts(String productType, String status, String startDate, String endDate);
+    List<ProductDetailsDTO> getProductAuditTrail(String productCode);
 }

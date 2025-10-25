@@ -16,6 +16,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class ProductChargeServiceImpl implements ProductChargeService {
@@ -114,5 +117,27 @@ public class ProductChargeServiceImpl implements ProductChargeService {
         
         // INSERT-ONLY Pattern: Save creates NEW row with crud_value='D' (soft delete marker)
         chargeRepository.save(deleteVersion);
+    }
+
+    @Override
+    public List<ProductChargeDTO> getChargesAuditTrail(String productCode) {
+        List<PRODUCT_CHARGES> allVersions = chargeRepository.findAllVersionsByProductCode(productCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("No charges found for product: " + productCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toChargeDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductChargeDTO> getChargeAuditTrail(String productCode, String chargeCode) {
+        List<PRODUCT_CHARGES> allVersions = chargeRepository.findAllVersionsByProductCodeAndChargeCode(productCode, chargeCode);
+        if (allVersions.isEmpty()) {
+            throw new ResourceNotFoundException("Charge not found: " + chargeCode);
+        }
+        return allVersions.stream()
+                .map(mapper::toChargeDto)
+                .collect(Collectors.toList());
     }
 }
