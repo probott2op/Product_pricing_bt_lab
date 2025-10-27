@@ -19,9 +19,9 @@ public interface ProductBalanceRepository extends JpaRepository<PRODUCT_BALANCE,
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
     @Query("SELECT b FROM PRODUCT_BALANCE b WHERE b.productCode = :productCode " +
-           "AND b.crud_value != 'D' " +
            "AND b.createdAt = (SELECT MAX(b2.createdAt) FROM PRODUCT_BALANCE b2 " +
-           "WHERE b2.balanceType = b.balanceType AND b2.productCode = :productCode AND b2.crud_value != 'D') " +
+           "WHERE b2.balanceType = b.balanceType AND b2.productCode = :productCode) " +
+           "AND b.crud_value != 'D' " +
            "ORDER BY b.createdAt DESC")
     List<PRODUCT_BALANCE> findByProductCode(@Param("productCode") String productCode);
     
@@ -38,31 +38,32 @@ public interface ProductBalanceRepository extends JpaRepository<PRODUCT_BALANCE,
                                                                       @Param("balanceType") PRODUCT_BALANCE_TYPE balanceType);
     
     // INSERT-ONLY Pattern: Find specific balance by productCode and balanceType
-    @Query(value = "SELECT b FROM PRODUCT_BALANCE b WHERE b.productCode = :productCode " +
+    @Query("SELECT b FROM PRODUCT_BALANCE b WHERE b.productCode = :productCode " +
            "AND b.balanceType = :balanceType " +
-           "AND b.crud_value != 'D' " +
-           "ORDER BY b.createdAt DESC LIMIT 1")
+           "AND b.createdAt = (SELECT MAX(b2.createdAt) FROM PRODUCT_BALANCE b2 " +
+           "WHERE b2.balanceType = :balanceType AND b2.productCode = :productCode) " +
+           "AND b.crud_value != 'D'")
     Optional<PRODUCT_BALANCE> findByProductCodeAndBalanceType(@Param("productCode") String productCode, 
                                                                @Param("balanceType") PRODUCT_BALANCE_TYPE balanceType);
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions for each balanceType by product
     @Query("SELECT b FROM PRODUCT_BALANCE b WHERE b.product = :product " +
-           "AND b.crud_value != 'D' " +
            "AND b.createdAt = (SELECT MAX(b2.createdAt) FROM PRODUCT_BALANCE b2 " +
-           "WHERE b2.balanceType = b.balanceType AND b2.crud_value != 'D')")
+           "WHERE b2.balanceType = b.balanceType AND b2.product = :product) " +
+           "AND b.crud_value != 'D'")
     Page<PRODUCT_BALANCE> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
-    @Query(value = "SELECT b FROM PRODUCT_BALANCE b WHERE b.product = :product " +
+    @Query("SELECT b FROM PRODUCT_BALANCE b WHERE b.product = :product " +
            "AND b.balanceId = :balanceId " +
-           "AND b.crud_value != 'D' " +
-           "ORDER BY b.createdAt DESC LIMIT 1")
+           "AND b.crud_value != 'D'")
     Optional<PRODUCT_BALANCE> findByProductAndBalanceId(@Param("product") PRODUCT_DETAILS product, 
                                                          @Param("balanceId") UUID balanceId);
     
-    @Query(value = "SELECT b FROM PRODUCT_BALANCE b WHERE b.product = :product " +
+    @Query("SELECT b FROM PRODUCT_BALANCE b WHERE b.product = :product " +
            "AND b.balanceType = :balanceType " +
-           "AND b.crud_value != 'D' " +
-           "ORDER BY b.createdAt DESC LIMIT 1")
+           "AND b.createdAt = (SELECT MAX(b2.createdAt) FROM PRODUCT_BALANCE b2 " +
+           "WHERE b2.balanceType = :balanceType AND b2.product = :product) " +
+           "AND b.crud_value != 'D'")
     Optional<PRODUCT_BALANCE> findByProductAndBalanceType(@Param("product") PRODUCT_DETAILS product, 
                                                            @Param("balanceType") PRODUCT_BALANCE_TYPE balanceType);
     

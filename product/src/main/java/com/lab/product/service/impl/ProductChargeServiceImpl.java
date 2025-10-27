@@ -126,7 +126,7 @@ public class ProductChargeServiceImpl implements ProductChargeService {
             throw new ResourceNotFoundException("No charges found for product: " + productCode);
         }
         return allVersions.stream()
-                .map(mapper::toChargeDto)
+                .map(mapper::toChargeDtoWithAudit)
                 .collect(Collectors.toList());
     }
 
@@ -137,7 +137,7 @@ public class ProductChargeServiceImpl implements ProductChargeService {
             throw new ResourceNotFoundException("Charge not found: " + chargeCode);
         }
         return allVersions.stream()
-                .map(mapper::toChargeDto)
+                .map(mapper::toChargeDtoWithAudit)
                 .collect(Collectors.toList());
     }
 }

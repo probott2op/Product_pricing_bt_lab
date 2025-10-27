@@ -16,9 +16,9 @@ public interface ProductRulesRepository extends JpaRepository<PRODUCT_RULES, UUI
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
     @Query("SELECT r FROM PRODUCT_RULES r WHERE r.productCode = :productCode " +
-           "AND r.crud_value != 'D' " +
            "AND r.createdAt = (SELECT MAX(r2.createdAt) FROM PRODUCT_RULES r2 " +
-           "WHERE r2.ruleCode = r.ruleCode AND r2.productCode = :productCode AND r2.crud_value != 'D') " +
+           "WHERE r2.ruleCode = r.ruleCode AND r2.productCode = :productCode) " +
+           "AND r.crud_value != 'D' " +
            "ORDER BY r.createdAt DESC")
     List<PRODUCT_RULES> findByProductCode(@Param("productCode") String productCode);
     
@@ -44,8 +44,8 @@ public interface ProductRulesRepository extends JpaRepository<PRODUCT_RULES, UUI
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions for each ruleCode by product
     @Query("SELECT r FROM PRODUCT_RULES r WHERE r.product = :product " +
-           "AND r.crud_value != 'D' " +
            "AND r.createdAt = (SELECT MAX(r2.createdAt) FROM PRODUCT_RULES r2 " +
-           "WHERE r2.ruleCode = r.ruleCode AND r2.crud_value != 'D')")
+           "WHERE r2.ruleCode = r.ruleCode AND r2.product = :product) " +
+           "AND r.crud_value != 'D'")
     Page<PRODUCT_RULES> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
 }

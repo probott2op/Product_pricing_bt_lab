@@ -35,6 +35,26 @@ public class ProductMapper {
         return dto;
     }
     
+    // Audit trail version - includes all audit fields
+    public ProductBalanceDTO toBalanceDtoWithAudit(PRODUCT_BALANCE balance) {
+        if (balance == null) return null;
+        ProductBalanceDTO dto = toBalanceDto(balance);
+        
+        // Copy audit fields
+        dto.setEfctv_date(balance.getEfctv_date());
+        dto.setCrud_value(balance.getCrud_value());
+        dto.setUser_id(balance.getUser_id());
+        dto.setWs_id(balance.getWs_id());
+        dto.setPrgm_id(balance.getPrgm_id());
+        dto.setHost_ts(balance.getHost_ts());
+        dto.setLocal_ts(balance.getLocal_ts());
+        dto.setAcpt_ts(balance.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(balance.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(balance.getUUID_reference());
+        
+        return dto;
+    }
+    
     public ProductChargeDTO toChargeDto(PRODUCT_CHARGES charge) {
         if (charge == null) return null;
         ProductChargeDTO dto = new ProductChargeDTO();
@@ -49,6 +69,27 @@ public class ProductMapper {
         return dto;
     }
     
+    // Audit trail version - includes all audit fields
+    public ProductChargeDTO toChargeDtoWithAudit(PRODUCT_CHARGES charge) {
+        if (charge == null) return null;
+        ProductChargeDTO dto = toChargeDto(charge);
+        
+        // Copy audit fields
+        dto.setCreatedAt(charge.getCreatedAt());
+        dto.setEfctv_date(charge.getEfctv_date());
+        dto.setCrud_value(charge.getCrud_value());
+        dto.setUser_id(charge.getUser_id());
+        dto.setWs_id(charge.getWs_id());
+        dto.setPrgm_id(charge.getPrgm_id());
+        dto.setHost_ts(charge.getHost_ts());
+        dto.setLocal_ts(charge.getLocal_ts());
+        dto.setAcpt_ts(charge.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(charge.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(charge.getUUID_reference());
+        
+        return dto;
+    }
+    
     public ProductRoleDTO toRoleDto(PRODUCT_ROLE role) {
         if (role == null) return null;
         ProductRoleDTO dto = new ProductRoleDTO();
@@ -58,6 +99,27 @@ public class ProductMapper {
         dto.setRoleName(role.getRoleType() != null ? role.getRoleType().name() : null);
         dto.setMandatory(role.isMandatory());
         dto.setMaxCount(role.getMaxCount());
+        return dto;
+    }
+    
+    // Audit trail version - includes all audit fields
+    public ProductRoleDTO toRoleDtoWithAudit(PRODUCT_ROLE role) {
+        if (role == null) return null;
+        ProductRoleDTO dto = toRoleDto(role);
+        
+        // Copy audit fields
+        dto.setCreatedAt(role.getCreatedAt());
+        dto.setEfctv_date(role.getEfctv_date());
+        dto.setCrud_value(role.getCrud_value());
+        dto.setUser_id(role.getUser_id());
+        dto.setWs_id(role.getWs_id());
+        dto.setPrgm_id(role.getPrgm_id());
+        dto.setHost_ts(role.getHost_ts());
+        dto.setLocal_ts(role.getLocal_ts());
+        dto.setAcpt_ts(role.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(role.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(role.getUUID_reference());
+        
         return dto;
     }
     
@@ -74,6 +136,27 @@ public class ProductMapper {
         return dto;
     }
     
+    // Audit trail version - includes all audit fields
+    public ProductRuleDTO toRuleDtoWithAudit(PRODUCT_RULES rule) {
+        if (rule == null) return null;
+        ProductRuleDTO dto = toRuleDto(rule);
+        
+        // Copy audit fields
+        dto.setCreatedAt(rule.getCreatedAt());
+        dto.setEfctv_date(rule.getEfctv_date());
+        dto.setCrud_value(rule.getCrud_value());
+        dto.setUser_id(rule.getUser_id());
+        dto.setWs_id(rule.getWs_id());
+        dto.setPrgm_id(rule.getPrgm_id());
+        dto.setHost_ts(rule.getHost_ts());
+        dto.setLocal_ts(rule.getLocal_ts());
+        dto.setAcpt_ts(rule.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(rule.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(rule.getUUID_reference());
+        
+        return dto;
+    }
+    
     public ProductTransactionDTO toTransactionDto(PRODUCT_TRANSACTION transaction) {
         if (transaction == null) return null;
         ProductTransactionDTO dto = new ProductTransactionDTO();
@@ -81,6 +164,27 @@ public class ProductMapper {
         dto.setTransactionCode(transaction.getTransactionCode());
         dto.setTransactionType(transaction.getTransactionType());
         dto.setAllowed(transaction.isAllowed());
+        return dto;
+    }
+    
+    // Audit trail version - includes all audit fields
+    public ProductTransactionDTO toTransactionDtoWithAudit(PRODUCT_TRANSACTION transaction) {
+        if (transaction == null) return null;
+        ProductTransactionDTO dto = toTransactionDto(transaction);
+        
+        // Copy audit fields
+        dto.setCreatedAt(transaction.getCreatedAt());
+        dto.setEfctv_date(transaction.getEfctv_date());
+        dto.setCrud_value(transaction.getCrud_value());
+        dto.setUser_id(transaction.getUser_id());
+        dto.setWs_id(transaction.getWs_id());
+        dto.setPrgm_id(transaction.getPrgm_id());
+        dto.setHost_ts(transaction.getHost_ts());
+        dto.setLocal_ts(transaction.getLocal_ts());
+        dto.setAcpt_ts(transaction.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(transaction.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(transaction.getUUID_reference());
+        
         return dto;
     }
     
@@ -97,6 +201,27 @@ public class ProductMapper {
         return dto;
     }
     
+    // Audit trail version - includes all audit fields
+    public ProductCommunicationDTO toCommunicationDtoWithAudit(PRODUCT_COMMUNICATION communication) {
+        if (communication == null) return null;
+        ProductCommunicationDTO dto = toCommunicationDto(communication);
+        
+        // Copy audit fields
+        dto.setCreatedAt(communication.getCreatedAt());
+        dto.setEfctv_date(communication.getEfctv_date());
+        dto.setCrud_value(communication.getCrud_value());
+        dto.setUser_id(communication.getUser_id());
+        dto.setWs_id(communication.getWs_id());
+        dto.setPrgm_id(communication.getPrgm_id());
+        dto.setHost_ts(communication.getHost_ts());
+        dto.setLocal_ts(communication.getLocal_ts());
+        dto.setAcpt_ts(communication.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(communication.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(communication.getUUID_reference());
+        
+        return dto;
+    }
+    
     public ProductInterestDTO toInterestDto(PRODUCT_INTEREST interest) {
         if (interest == null) return null;
         ProductInterestDTO dto = new ProductInterestDTO();
@@ -107,6 +232,27 @@ public class ProductMapper {
         dto.setRateNonCumulativeMonthly(interest.getRateNonCumulativeMonthly());
         dto.setRateNonCumulativeQuarterly(interest.getRateNonCumulativeQuarterly());
         dto.setRateNonCumulativeYearly(interest.getRateNonCumulativeYearly());
+        return dto;
+    }
+    
+    // Audit trail version - includes all audit fields
+    public ProductInterestDTO toInterestDtoWithAudit(PRODUCT_INTEREST interest) {
+        if (interest == null) return null;
+        ProductInterestDTO dto = toInterestDto(interest);
+        
+        // Copy audit fields
+        dto.setCreatedAt(interest.getCreatedAt());
+        dto.setEfctv_date(interest.getEfctv_date());
+        dto.setCrud_value(interest.getCrud_value());
+        dto.setUser_id(interest.getUser_id());
+        dto.setWs_id(interest.getWs_id());
+        dto.setPrgm_id(interest.getPrgm_id());
+        dto.setHost_ts(interest.getHost_ts());
+        dto.setLocal_ts(interest.getLocal_ts());
+        dto.setAcpt_ts(interest.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(interest.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(interest.getUUID_reference());
+        
         return dto;
     }
     
@@ -199,84 +345,50 @@ public class ProductMapper {
         dto.setInterestType(product.getInterestType());
         dto.setCompoundingFrequency(product.getCompoundingFrequency());
         
+        dto.setCreatedAt(product.getCreatedAt());
+        dto.setEfctv_date(product.getEfctv_date());
+        
         // INSERT-ONLY Pattern: Fetch only latest versions using repositories
         String productCode = product.getProductCode();
         
         // rules - fetch latest versions by productCode
         List<PRODUCT_RULES> latestRules = rulesRepository.findByProductCode(productCode);
         if (latestRules != null && !latestRules.isEmpty()) {
-            dto.setProductRules(latestRules.stream().map(r -> {
-                ProductRuleDTO rd = new ProductRuleDTO();
-                rd.setRuleId(r.getRuleId());
-                rd.setRuleCode(r.getRuleCode());
-                rd.setRuleName(r.getRuleName());
-                rd.setRuleType(r.getRuleType());
-                rd.setDataType(r.getDataType());
-                rd.setRuleValue(r.getRuleValue());
-                rd.setValidationType(r.getValidationType());
-                return rd;
-            }).collect(Collectors.toList()));
+            dto.setProductRules(latestRules.stream()
+                .map(this::toRuleDto)
+                .collect(Collectors.toList()));
         }
 
         // charges - fetch latest versions by productCode
         List<PRODUCT_CHARGES> latestCharges = chargeRepository.findByProductCode(productCode);
         if (latestCharges != null && !latestCharges.isEmpty()) {
-            dto.setProductCharges(latestCharges.stream().map(c -> {
-                ProductChargeDTO cd = new ProductChargeDTO();
-                cd.setChargeId(c.getChargeId());
-                cd.setChargeCode(c.getChargeCode());
-                cd.setChargeName(c.getChargeName());
-                cd.setChargeType(c.getChargeType());
-                cd.setCalculationType(c.getCalculationType());
-                cd.setFrequency(c.getFrequency());
-                cd.setAmount(c.getChargeValue());
-                cd.setDebitCredit(c.getDebitCredit());
-                return cd;
-            }).collect(Collectors.toList()));
+            dto.setProductCharges(latestCharges.stream()
+                .map(this::toChargeDto)
+                .collect(Collectors.toList()));
         }
 
         // roles - fetch latest versions by productCode
         List<PRODUCT_ROLE> latestRoles = roleRepository.findByProductCode(productCode);
         if (latestRoles != null && !latestRoles.isEmpty()) {
-            dto.setProductRoles(latestRoles.stream().map(r -> {
-                ProductRoleDTO pr = new ProductRoleDTO();
-                pr.setRoleId(r.getRoleId());
-                pr.setRoleCode(r.getRoleCode());
-                pr.setRoleType(r.getRoleType());
-                pr.setRoleName(r.getRoleType() != null ? r.getRoleType().name() : null);
-                pr.setMandatory(r.isMandatory());
-                pr.setMaxCount(r.getMaxCount());
-                return pr;
-            }).collect(Collectors.toList()));
+            dto.setProductRoles(latestRoles.stream()
+                .map(this::toRoleDto)
+                .collect(Collectors.toList()));
         }
 
         // transactions - fetch latest versions by productCode
         List<PRODUCT_TRANSACTION> latestTransactions = transactionRepository.findByProductCode(productCode);
         if (latestTransactions != null && !latestTransactions.isEmpty()) {
-            dto.setProductTransactions(latestTransactions.stream().map(t -> {
-                ProductTransactionDTO pt = new ProductTransactionDTO();
-                pt.setTransactionId(t.getId());
-                pt.setTransactionCode(t.getTransactionCode());
-                pt.setTransactionType(t.getTransactionType());
-                pt.setAllowed(t.isAllowed());
-                return pt;
-            }).collect(Collectors.toList()));
+            dto.setProductTransactions(latestTransactions.stream()
+                .map(this::toTransactionDto)
+                .collect(Collectors.toList()));
         }
         
         // Interests - fetch latest versions by productCode
         List<PRODUCT_INTEREST> latestInterests = interestRepository.findByProductCode(productCode);
         if (latestInterests != null && !latestInterests.isEmpty()) {
-            dto.setProductInterests(latestInterests.stream().map(t -> {
-                ProductInterestDTO pi = new ProductInterestDTO();
-                pi.setRateId(t.getRateId());
-                pi.setRateCode(t.getRateCode());
-                pi.setRateCumulative(t.getRateCumulative());
-                pi.setTermInMonths(t.getTermInMonths());
-                pi.setRateNonCumulativeMonthly(t.getRateNonCumulativeMonthly());
-                pi.setRateNonCumulativeQuarterly(t.getRateNonCumulativeQuarterly());
-                pi.setRateNonCumulativeYearly(t.getRateNonCumulativeYearly());
-                return pi;
-            }).collect(Collectors.toList()));
+            dto.setProductInterests(latestInterests.stream()
+                .map(this::toInterestDto)
+                .collect(Collectors.toList()));
         }
 
         // balances - fetch latest versions by productCode
@@ -290,21 +402,30 @@ public class ProductMapper {
         // communications - fetch latest versions by productCode
         List<PRODUCT_COMMUNICATION> latestComms = communicationRepository.findByProductCode(productCode);
         if (latestComms != null && !latestComms.isEmpty()) {
-            dto.setProductCommunications(latestComms.stream().map(c -> {
-                ProductCommunicationDTO pc = new ProductCommunicationDTO();
-                pc.setCommId(c.getCommId());
-                pc.setCommCode(c.getCommCode());
-                pc.setCommunicationType(c.getCommunicationType());
-                pc.setChannel(c.getChannel());
-                pc.setEvent(c.getEvent());
-                pc.setTemplate(c.getTemplate());
-                pc.setFrequencyLimit(c.getFrequencyLimit());
-                return pc;
-            }).collect(Collectors.toList()));
+            dto.setProductCommunications(latestComms.stream()
+                .map(this::toCommunicationDto)
+                .collect(Collectors.toList()));
         }
 
-        dto.setCreatedAt(product.getCreatedAt());
-        dto.setEfctv_date(product.getEfctv_date());
+        return dto;
+    }
+    
+    // Audit trail version - includes all audit fields
+    public ProductDetailsDTO toDtoWithAudit(PRODUCT_DETAILS product) {
+        if (product == null) return null;
+        ProductDetailsDTO dto = toDto(product);
+        
+        // Copy audit fields
+        dto.setCrud_value(product.getCrud_value());
+        dto.setUser_id(product.getUser_id());
+        dto.setWs_id(product.getWs_id());
+        dto.setPrgm_id(product.getPrgm_id());
+        dto.setHost_ts(product.getHost_ts());
+        dto.setLocal_ts(product.getLocal_ts());
+        dto.setAcpt_ts(product.getAcpt_ts());
+        dto.setAcpt_ts_utc_ofst(product.getAcpt_ts_utc_ofst());
+        dto.setUUID_reference(product.getUUID_reference());
+        
         return dto;
     }
 

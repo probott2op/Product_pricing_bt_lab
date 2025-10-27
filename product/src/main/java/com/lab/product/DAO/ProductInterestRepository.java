@@ -18,9 +18,9 @@ public interface ProductInterestRepository extends JpaRepository<PRODUCT_INTERES
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
     @Query("SELECT i FROM PRODUCT_INTEREST i WHERE i.productCode = :productCode " +
-           "AND i.crud_value != 'D' " +
            "AND i.createdAt = (SELECT MAX(i2.createdAt) FROM PRODUCT_INTEREST i2 " +
-           "WHERE i2.rateCode = i.rateCode AND i2.productCode = :productCode AND i2.crud_value != 'D') " +
+           "WHERE i2.rateCode = i.rateCode AND i2.productCode = :productCode) " +
+           "AND i.crud_value != 'D' " +
            "ORDER BY i.createdAt DESC")
     List<PRODUCT_INTEREST> findByProductCode(@Param("productCode") String productCode);
     
@@ -37,31 +37,32 @@ public interface ProductInterestRepository extends JpaRepository<PRODUCT_INTERES
                                                                     @Param("rateCode") String rateCode);
     
     // INSERT-ONLY Pattern: Find specific rate by productCode and rateCode
-    @Query(value = "SELECT i FROM PRODUCT_INTEREST i WHERE i.productCode = :productCode " +
+    @Query("SELECT i FROM PRODUCT_INTEREST i WHERE i.productCode = :productCode " +
            "AND i.rateCode = :rateCode " +
-           "AND i.crud_value != 'D' " +
-           "ORDER BY i.createdAt DESC LIMIT 1")
+           "AND i.createdAt = (SELECT MAX(i2.createdAt) FROM PRODUCT_INTEREST i2 " +
+           "WHERE i2.rateCode = :rateCode AND i2.productCode = :productCode) " +
+           "AND i.crud_value != 'D'")
     Optional<PRODUCT_INTEREST> findByProductCodeAndRateCode(@Param("productCode") String productCode, 
                                                              @Param("rateCode") String rateCode);
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions for each rateCode by product
     @Query("SELECT i FROM PRODUCT_INTEREST i WHERE i.product = :product " +
-           "AND i.crud_value != 'D' " +
            "AND i.createdAt = (SELECT MAX(i2.createdAt) FROM PRODUCT_INTEREST i2 " +
-           "WHERE i2.rateCode = i.rateCode AND i2.crud_value != 'D')")
+           "WHERE i2.rateCode = i.rateCode AND i2.product = :product) " +
+           "AND i.crud_value != 'D'")
     Page<PRODUCT_INTEREST> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
-    @Query(value = "SELECT i FROM PRODUCT_INTEREST i WHERE i.product = :product " +
+    @Query("SELECT i FROM PRODUCT_INTEREST i WHERE i.product = :product " +
            "AND i.rateId = :interestId " +
-           "AND i.crud_value != 'D' " +
-           "ORDER BY i.createdAt DESC LIMIT 1")
+           "AND i.crud_value != 'D'")
     Optional<PRODUCT_INTEREST> findByProductAndRateId(@Param("product") PRODUCT_DETAILS product, 
                                                        @Param("interestId") UUID interestId);
     
-    @Query(value = "SELECT i FROM PRODUCT_INTEREST i WHERE i.product = :product " +
+    @Query("SELECT i FROM PRODUCT_INTEREST i WHERE i.product = :product " +
            "AND i.rateCode = :rateCode " +
-           "AND i.crud_value != 'D' " +
-           "ORDER BY i.createdAt DESC LIMIT 1")
+           "AND i.createdAt = (SELECT MAX(i2.createdAt) FROM PRODUCT_INTEREST i2 " +
+           "WHERE i2.rateCode = :rateCode AND i2.product = :product) " +
+           "AND i.crud_value != 'D'")
     Optional<PRODUCT_INTEREST> findByProductAndRateCode(@Param("product") PRODUCT_DETAILS product, 
                                                          @Param("rateCode") String rateCode);
     

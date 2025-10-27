@@ -127,7 +127,7 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
             throw new ResourceNotFoundException("No balances found for product: " + productCode);
         }
         return allVersions.stream()
-                .map(mapper::toBalanceDto)
+                .map(mapper::toBalanceDtoWithAudit)
                 .collect(Collectors.toList());
     }
 
@@ -139,7 +139,7 @@ public class ProductBalanceServiceImpl implements ProductBalanceService {
             throw new ResourceNotFoundException("Balance type not found: " + balanceType);
         }
         return allVersions.stream()
-                .map(mapper::toBalanceDto)
+                .map(mapper::toBalanceDtoWithAudit)
                 .collect(Collectors.toList());
     }
 }

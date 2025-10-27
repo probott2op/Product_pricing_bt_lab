@@ -126,7 +126,7 @@ public class ProductInterestServiceImpl implements ProductInterestService {
             throw new ResourceNotFoundException("No interest rates found for product: " + productCode);
         }
         return allVersions.stream()
-                .map(mapper::toInterestDto)
+                .map(mapper::toInterestDtoWithAudit)
                 .collect(Collectors.toList());
     }
 
@@ -137,7 +137,7 @@ public class ProductInterestServiceImpl implements ProductInterestService {
             throw new ResourceNotFoundException("Interest rate not found: " + rateCode);
         }
         return allVersions.stream()
-                .map(mapper::toInterestDto)
+                .map(mapper::toInterestDtoWithAudit)
                 .collect(Collectors.toList());
     }
 }

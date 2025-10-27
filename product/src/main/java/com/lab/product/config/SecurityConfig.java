@@ -43,9 +43,12 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorize -> authorize
                 // Public endpoints - no authentication required
-                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/error").permitAll()
+                
+                // All GET endpoints - public (no authentication)
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 
                 // Admin-only endpoints - POST, PUT, DELETE require ADMIN role
                 .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")

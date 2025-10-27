@@ -18,9 +18,9 @@ public interface ProductChargeRepository extends JpaRepository<PRODUCT_CHARGES, 
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
     @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.productCode = :productCode " +
-           "AND c.crud_value != 'D' " +
            "AND c.createdAt = (SELECT MAX(c2.createdAt) FROM PRODUCT_CHARGES c2 " +
-           "WHERE c2.chargeCode = c.chargeCode AND c2.productCode = :productCode AND c2.crud_value != 'D') " +
+           "WHERE c2.chargeCode = c.chargeCode AND c2.productCode = :productCode) " +
+           "AND c.crud_value != 'D' " +
            "ORDER BY c.createdAt DESC")
     List<PRODUCT_CHARGES> findByProductCode(@Param("productCode") String productCode);
     
@@ -37,31 +37,32 @@ public interface ProductChargeRepository extends JpaRepository<PRODUCT_CHARGES, 
                                                                      @Param("chargeCode") String chargeCode);
     
     // INSERT-ONLY Pattern: Find specific charge by productCode and chargeCode
-    @Query(value = "SELECT c FROM PRODUCT_CHARGES c WHERE c.productCode = :productCode " +
+    @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.productCode = :productCode " +
            "AND c.chargeCode = :chargeCode " +
-           "AND c.crud_value != 'D' " +
-           "ORDER BY c.createdAt DESC LIMIT 1")
+           "AND c.createdAt = (SELECT MAX(c2.createdAt) FROM PRODUCT_CHARGES c2 " +
+           "WHERE c2.chargeCode = :chargeCode AND c2.productCode = :productCode) " +
+           "AND c.crud_value != 'D'")
     Optional<PRODUCT_CHARGES> findByProductCodeAndChargeCode(@Param("productCode") String productCode, 
-                                                              @Param("chargeCode") String chargeCode);
+                                                                     @Param("chargeCode") String chargeCode);
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions for each chargeCode by product
     @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
-           "AND c.crud_value != 'D' " +
            "AND c.createdAt = (SELECT MAX(c2.createdAt) FROM PRODUCT_CHARGES c2 " +
-           "WHERE c2.chargeCode = c.chargeCode AND c2.crud_value != 'D')")
+           "WHERE c2.chargeCode = c.chargeCode AND c2.product = :product) " +
+           "AND c.crud_value != 'D'")
     Page<PRODUCT_CHARGES> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
-    @Query(value = "SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
+    @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
            "AND c.chargeId = :chargeId " +
-           "AND c.crud_value != 'D' " +
-           "ORDER BY c.createdAt DESC LIMIT 1")
+           "AND c.crud_value != 'D'")
     Optional<PRODUCT_CHARGES> findByProductAndChargeId(@Param("product") PRODUCT_DETAILS product, 
                                                         @Param("chargeId") UUID chargeId);
     
-    @Query(value = "SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
+    @Query("SELECT c FROM PRODUCT_CHARGES c WHERE c.product = :product " +
            "AND c.chargeCode = :chargeCode " +
-           "AND c.crud_value != 'D' " +
-           "ORDER BY c.createdAt DESC LIMIT 1")
+           "AND c.createdAt = (SELECT MAX(c2.createdAt) FROM PRODUCT_CHARGES c2 " +
+           "WHERE c2.chargeCode = :chargeCode AND c2.product = :product) " +
+           "AND c.crud_value != 'D'")
     Optional<PRODUCT_CHARGES> findByProductAndChargeCode(@Param("product") PRODUCT_DETAILS product, 
                                                           @Param("chargeCode") String chargeCode);
     

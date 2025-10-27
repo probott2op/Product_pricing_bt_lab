@@ -224,7 +224,7 @@ public class ProductServiceImpl implements ProductService {
             throw new ResourceNotFoundException("Product not found: " + productCode);
         }
         return allVersions.stream()
-                .map(mapper::toDto)
+                .map(mapper::toDtoWithAudit)
                 .collect(Collectors.toList());
     }
 

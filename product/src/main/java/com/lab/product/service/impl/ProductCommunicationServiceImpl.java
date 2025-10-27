@@ -127,7 +127,7 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
             throw new ResourceNotFoundException("No communications found for product: " + productCode);
         }
         return allVersions.stream()
-                .map(productMapper::toCommunicationDto)
+                .map(productMapper::toCommunicationDtoWithAudit)
                 .collect(Collectors.toList());
     }
 
@@ -138,7 +138,7 @@ public class ProductCommunicationServiceImpl implements ProductCommunicationServ
             throw new ResourceNotFoundException("Communication not found: " + commCode);
         }
         return allVersions.stream()
-                .map(productMapper::toCommunicationDto)
+                .map(productMapper::toCommunicationDtoWithAudit)
                 .collect(Collectors.toList());
     }
 }

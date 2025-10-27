@@ -123,7 +123,7 @@ public class ProductRoleServiceImpl implements ProductRoleService {
             throw new ResourceNotFoundException("No roles found for product: " + productCode);
         }
         return allVersions.stream()
-                .map(mapper::toRoleDto)
+                .map(mapper::toRoleDtoWithAudit)
                 .collect(Collectors.toList());
     }
 
@@ -134,7 +134,7 @@ public class ProductRoleServiceImpl implements ProductRoleService {
             throw new ResourceNotFoundException("Role not found: " + roleCode);
         }
         return allVersions.stream()
-                .map(mapper::toRoleDto)
+                .map(mapper::toRoleDtoWithAudit)
                 .collect(Collectors.toList());
     }
 }

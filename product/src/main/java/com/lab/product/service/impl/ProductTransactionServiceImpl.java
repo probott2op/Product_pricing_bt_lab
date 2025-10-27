@@ -120,7 +120,7 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
             throw new ResourceNotFoundException("No transactions found for product: " + productCode);
         }
         return allVersions.stream()
-                .map(mapper::toTransactionDto)
+                .map(mapper::toTransactionDtoWithAudit)
                 .collect(Collectors.toList());
     }
 
@@ -131,7 +131,7 @@ public class ProductTransactionServiceImpl implements ProductTransactionService 
             throw new ResourceNotFoundException("Transaction not found: " + transactionCode);
         }
         return allVersions.stream()
-                .map(mapper::toTransactionDto)
+                .map(mapper::toTransactionDtoWithAudit)
                 .collect(Collectors.toList());
     }
 }

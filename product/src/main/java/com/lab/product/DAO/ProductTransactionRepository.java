@@ -18,9 +18,9 @@ public interface ProductTransactionRepository extends JpaRepository<PRODUCT_TRAN
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions by productCode
     @Query("SELECT t FROM PRODUCT_TRANSACTION t WHERE t.productCode = :productCode " +
-           "AND t.crud_value != 'D' " +
            "AND t.createdAt = (SELECT MAX(t2.createdAt) FROM PRODUCT_TRANSACTION t2 " +
-           "WHERE t2.transactionCode = t.transactionCode AND t2.productCode = :productCode AND t2.crud_value != 'D') " +
+           "WHERE t2.transactionCode = t.transactionCode AND t2.productCode = :productCode) " +
+           "AND t.crud_value != 'D' " +
            "ORDER BY t.createdAt DESC")
     List<PRODUCT_TRANSACTION> findByProductCode(@Param("productCode") String productCode);
     
@@ -37,31 +37,32 @@ public interface ProductTransactionRepository extends JpaRepository<PRODUCT_TRAN
                                                                               @Param("transactionCode") String transactionCode);
     
     // INSERT-ONLY Pattern: Find specific transaction by productCode and transactionCode
-    @Query(value = "SELECT t FROM PRODUCT_TRANSACTION t WHERE t.productCode = :productCode " +
+    @Query("SELECT t FROM PRODUCT_TRANSACTION t WHERE t.productCode = :productCode " +
            "AND t.transactionCode = :transactionCode " +
-           "AND t.crud_value != 'D' " +
-           "ORDER BY t.createdAt DESC LIMIT 1")
+           "AND t.createdAt = (SELECT MAX(t2.createdAt) FROM PRODUCT_TRANSACTION t2 " +
+           "WHERE t2.transactionCode = :transactionCode AND t2.productCode = :productCode) " +
+           "AND t.crud_value != 'D'")
     Optional<PRODUCT_TRANSACTION> findByProductCodeAndTransactionCode(@Param("productCode") String productCode, 
                                                                        @Param("transactionCode") String transactionCode);
     
     // INSERT-ONLY Pattern: Find latest non-deleted versions for each transactionCode by product
     @Query("SELECT t FROM PRODUCT_TRANSACTION t WHERE t.product = :product " +
-           "AND t.crud_value != 'D' " +
            "AND t.createdAt = (SELECT MAX(t2.createdAt) FROM PRODUCT_TRANSACTION t2 " +
-           "WHERE t2.transactionCode = t.transactionCode AND t2.crud_value != 'D')")
+           "WHERE t2.transactionCode = t.transactionCode AND t2.product = :product) " +
+           "AND t.crud_value != 'D'")
     Page<PRODUCT_TRANSACTION> findByProduct(@Param("product") PRODUCT_DETAILS product, Pageable pageable);
     
-    @Query(value = "SELECT t FROM PRODUCT_TRANSACTION t WHERE t.product = :product " +
+    @Query("SELECT t FROM PRODUCT_TRANSACTION t WHERE t.product = :product " +
            "AND t.id = :transactionId " +
-           "AND t.crud_value != 'D' " +
-           "ORDER BY t.createdAt DESC LIMIT 1")
+           "AND t.crud_value != 'D'")
     Optional<PRODUCT_TRANSACTION> findByProductAndId(@Param("product") PRODUCT_DETAILS product, 
                                                       @Param("transactionId") UUID transactionId);
     
-    @Query(value = "SELECT t FROM PRODUCT_TRANSACTION t WHERE t.product = :product " +
+    @Query("SELECT t FROM PRODUCT_TRANSACTION t WHERE t.product = :product " +
            "AND t.transactionCode = :transactionCode " +
-           "AND t.crud_value != 'D' " +
-           "ORDER BY t.createdAt DESC LIMIT 1")
+           "AND t.createdAt = (SELECT MAX(t2.createdAt) FROM PRODUCT_TRANSACTION t2 " +
+           "WHERE t2.transactionCode = :transactionCode AND t2.product = :product) " +
+           "AND t.crud_value != 'D'")
     Optional<PRODUCT_TRANSACTION> findByProductAndTransactionCode(@Param("product") PRODUCT_DETAILS product, 
                                                                    @Param("transactionCode") String transactionCode);
     

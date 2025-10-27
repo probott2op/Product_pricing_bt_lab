@@ -124,7 +124,7 @@ public class ProductRuleServiceImpl implements ProductRuleService {
             throw new ResourceNotFoundException("No rules found for product: " + productCode);
         }
         return allVersions.stream()
-                .map(mapper::toRuleDto)
+                .map(mapper::toRuleDtoWithAudit)
                 .collect(Collectors.toList());
     }
 
@@ -135,7 +135,7 @@ public class ProductRuleServiceImpl implements ProductRuleService {
             throw new ResourceNotFoundException("Rule not found: " + ruleCode);
         }
         return allVersions.stream()
-                .map(mapper::toRuleDto)
+                .map(mapper::toRuleDtoWithAudit)
                 .collect(Collectors.toList());
     }
 }
